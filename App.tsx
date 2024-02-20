@@ -6,6 +6,8 @@
  */
 
 import React from 'react';
+import * as React from 'react';
+import { NavigationContainer } from '@react-navigation/native';
 import type {PropsWithChildren} from 'react';
 import {
   SafeAreaView,
@@ -63,6 +65,7 @@ function App(): React.JSX.Element {
   };
 
   return (
+  <NavigationContainer>
     <SafeAreaView style={backgroundStyle}>
       <StatusBar
         barStyle={isDarkMode ? 'light-content' : 'dark-content'}
@@ -93,6 +96,7 @@ function App(): React.JSX.Element {
         </View>
       </ScrollView>
     </SafeAreaView>
+    </NavigationContainer>
   );
 }
 
