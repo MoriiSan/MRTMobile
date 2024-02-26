@@ -1,13 +1,6 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- */
-
 import * as React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
-import type {PropsWithChildren} from 'react';
+import type { PropsWithChildren } from 'react';
 import {
   SafeAreaView,
   ScrollView,
@@ -16,106 +9,115 @@ import {
   Text,
   useColorScheme,
   View,
+  TextInput,
+  TouchableOpacity
 } from 'react-native';
-
-import {
-  Colors,
-  DebugInstructions,
-  Header,
-  LearnMoreLinks,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
 
 type SectionProps = PropsWithChildren<{
   title: string;
 }>;
 
-function Section({children, title}: SectionProps): React.JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
-  return (
-    <View style={styles.sectionContainer}>
-      <Text
-        style={[
-          styles.sectionTitle,
-          {
-            color: isDarkMode ? Colors.white : Colors.black,
-          },
-        ]}>
-        {title}
-      </Text>
-      <Text
-        style={[
-          styles.sectionDescription,
-          {
-            color: isDarkMode ? Colors.light : Colors.dark,
-          },
-        ]}>
-        {children}
-      </Text>
-    </View>
-  );
-}
-
 function App(): React.JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
-
-  const backgroundStyle = {
-    backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
-  };
-
   return (
-  <NavigationContainer>
-    <SafeAreaView style={backgroundStyle}>
-      <StatusBar
-        barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-        backgroundColor={backgroundStyle.backgroundColor}
-      />
-      <ScrollView
-        contentInsetAdjustmentBehavior="automatic"
-        style={backgroundStyle}>
-        <Header />
-        <View
-          style={{
-            backgroundColor: isDarkMode ? Colors.black : Colors.white,
-          }}>
-          <Section title="Step One">
-            Edit <Text style={styles.highlight}>App.tsx</Text> to change this
-            screen and then come back to see your edits.
-          </Section>
-          <Section title="See Your Changes">
-            <ReloadInstructions />
-          </Section>
-          <Section title="Debug">
-            <DebugInstructions />
-          </Section>
-          <Section title="Learn More">
-            Read the docs to discover what to do next:
-          </Section>
-          <LearnMoreLinks />
-        </View>
-      </ScrollView>
-    </SafeAreaView>
+    <NavigationContainer>
+      <SafeAreaView style={styles.container}>
+        <StatusBar />
+        <ScrollView>
+          <View style={styles.pinContainer}>
+            <Text style={styles.pinTitle}>
+              Welcome to MRT Mobile
+            </Text>
+            <Text style={styles.pinDescr}>
+              Enter your 4-digit passcode
+            </Text>
+            <View style={styles.pinInputContainer}>
+              <TextInput
+                style={styles.pinInput}
+                keyboardType="numeric"
+                maxLength={1}
+                secureTextEntry={true}
+              />
+              <TextInput
+                style={styles.pinInput}
+                keyboardType="numeric"
+                maxLength={1}
+                secureTextEntry={true}
+              />
+              <TextInput
+                style={styles.pinInput}
+                keyboardType="numeric"
+                maxLength={1}
+                secureTextEntry={true}
+              />
+              <TextInput
+                style={styles.pinInput}
+                keyboardType="numeric"
+                maxLength={1}
+                secureTextEntry={true}
+              />
+            </View>
+            <TouchableOpacity
+              style={styles.submitBtn}
+              onPress={() => console.log('Submit btn pressed')}
+            >
+              <Text
+                style={styles.submitText}
+              >Submit</Text>
+            </TouchableOpacity>
+          </View>
+        </ScrollView>
+      </SafeAreaView>
     </NavigationContainer>
   );
 }
 
 const styles = StyleSheet.create({
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
   },
-  sectionTitle: {
+  pinContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+  },
+  pinTitle: {
     fontSize: 24,
-    fontWeight: '600',
+    fontWeight: '900',
+    color: 'black',
+    marginBottom: 10,
   },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
+  pinDescr: {
+    fontSize: 16,
     fontWeight: '400',
+    color: '#888',
+    marginBottom: 20,
   },
-  highlight: {
-    fontWeight: '700',
+  pinInputContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
+  pinInput: {
+    height: 40,
+    width: 40,
+    borderWidth: 1,
+    borderColor: '#888',
+    borderRadius: 5,
+    marginHorizontal: 5,
+    textAlign: 'center',
+  },
+  submitBtn: {
+    marginTop: 10,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 5,
+    backgroundColor: '#ffb301',
+  },
+  submitText: {
+    fontWeight: '900',
+  }
 });
 
 export default App;
