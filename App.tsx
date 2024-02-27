@@ -1,6 +1,7 @@
 import * as React from 'react';
 import Welcome from "./screens/Welcome";
 import Home from "./screens/Home";
+import Account from "./screens/Account";
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
@@ -35,6 +36,11 @@ export default function App() {
         <Stack.Screen
           name="Home"
           component={Home}
+        />
+        <Stack.Screen
+          name="Account"
+          component={Account}
+          /* options={{ headerShown: false }} */
         />
       </Stack.Navigator>
     </NavigationContainer>
