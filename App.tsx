@@ -2,6 +2,8 @@ import * as React from 'react';
 import Welcome from "./screens/Welcome";
 import Home from "./screens/Home";
 import Account from "./screens/Account";
+import Logs from "./screens/Logs";
+import AddCard from "./screens/AddCard";
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
@@ -36,11 +38,22 @@ export default function App() {
         <Stack.Screen
           name="Home"
           component={Home}
+          options={{ headerShown: false }} 
         />
         <Stack.Screen
           name="Account"
           component={Account}
-          /* options={{ headerShown: false }} */
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="Transaction Logs"
+          component={Logs}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="Add Card"
+          component={AddCard}
+          options={{ headerShown: false }}
         />
       </Stack.Navigator>
     </NavigationContainer>

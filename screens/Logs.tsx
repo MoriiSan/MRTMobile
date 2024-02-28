@@ -6,7 +6,7 @@ import Icon from 'react-native-vector-icons/Ionicons';
 
 
 
-export default function Account() {
+export default function Logs() {
     const navigation = useNavigation();
 
     return (
@@ -22,16 +22,9 @@ export default function Account() {
                     />
                 </TouchableOpacity>
                 <Text style={styles.headerText}>
-                    Account
+                    Transaction Logs
                 </Text>
                 <View style={{ flex: 1 }}></View>
-            </View>
-            <View>
-                <TouchableOpacity
-                    onPress={() => navigation.navigate('Welcome' as never)}
-                >
-                    <Text style={styles.signOutBtn}>Sign Out</Text>
-                </TouchableOpacity>
             </View>
         </SafeAreaView >
     );
@@ -68,7 +61,4 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontWeight: '500',
     },
-    signOutBtn: {
-        color: '#262020',
-    }
 });
