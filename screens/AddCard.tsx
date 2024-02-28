@@ -128,5 +128,5 @@ const styles = StyleSheet.create({
     saveBtnText: {
         color: '#262020',
         fontWeight: '500',
-    }
+    },
 });

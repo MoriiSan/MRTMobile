@@ -26,11 +26,11 @@ export default function Account() {
                 </Text>
                 <View style={{ flex: 1 }}></View>
             </View>
-            <View>
+            <View style={styles.signOutContainer}>
                 <TouchableOpacity
-                    onPress={() => navigation.navigate('Welcome' as never)}
-                >
-                    <Text style={styles.signOutBtn}>Sign Out</Text>
+                    style={styles.signOutBtn}
+                    onPress={() => navigation.navigate('Welcome' as never)}>
+                    <Text style={styles.signOutBtnText}>Sign Out</Text>
                 </TouchableOpacity>
             </View>
         </SafeAreaView >
@@ -68,7 +68,28 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontWeight: '500',
     },
+    signOutContainer: {
+        position: 'absolute',
+        bottom: 0,
+        alignItems: 'center',
+        alignSelf: 'stretch',
+        width: '100%',
+    },
     signOutBtn: {
         color: '#262020',
-    }
+        padding: 10,
+        margin: 15,
+        backgroundColor: '#fece2e',
+        borderColor: '#262020',
+        borderWidth: 1.5,
+        borderBottomWidth: 4,
+        borderRightWidth: 4,
+        borderRadius: 10,
+        alignItems: 'center',
+        alignSelf: 'stretch'
+    },
+    signOutBtnText: {
+        color: '#262020',
+        fontWeight: '500',
+    },
 });
