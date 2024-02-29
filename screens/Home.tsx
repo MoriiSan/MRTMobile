@@ -1,4 +1,5 @@
-import { useNavigation } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useNavigation, useIsFocused } from '@react-navigation/native';
 import * as React from 'react';
 import { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, RefreshControl, ActivityIndicator, Animated } from 'react-native';
@@ -8,39 +9,50 @@ import Icon from 'react-native-vector-icons/Ionicons';
 
 export default function Home() {
     const navigation = useNavigation();
-    const [card, setCard] = useState(null);
+    const isFocused = useIsFocused();
     const [uid, setUid] = useState('');
     const [bal, setBal] = useState('');
+    const [label, setLabel] = useState('');
+
     const [refreshing, setRefreshing] = useState(false);
     const [loader, setLoader] = useState(false);
     const [currentDate, setCurrentDate] = useState('');
+    const [lastUpdated, setLastUpdated] = useState('')
 
-    const fetchCard = async () => {
+    const fetchSavedCard = async () => {
         try {
-            const response = await fetch(`http://10.200.52.157:8080/cards/1111111111`, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-            });
-            const fetchedCard = await response.json();
-            if (response.ok) {
-                setUid(fetchedCard.uid)
-                setBal(fetchedCard.bal)
-            } else {
-                console.log("failed to fetch card")
-                return;
+            const savedCardData = await AsyncStorage.getItem('savedCard');
+            if (savedCardData !== null) {
+                const parsedCardData = JSON.parse(savedCardData);
+                setUid(parsedCardData.uid);
+                setLabel(parsedCardData.label.toUpperCase());
+                // Fetch the card based on the UID
+                const response = await fetch(`https://mrt-system-be.onrender.com/cards/${parsedCardData.uid}`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                });
+                const fetchedCard = await response.json();
+                if (response.ok) {
+                    setBal(fetchedCard.bal);
+                    // Update last updated information
+                    const date = new Date();
+                    const formattedDate = `${date.getDate()} ${getMonthName(date.getMonth())} ${date.getFullYear()} ${date.getHours()}:${date.getMinutes() < 10 ? '0' : ''}${date.getMinutes()} ${date.getHours() >= 12 ? 'PM' : 'AM'}`;
+                    setLastUpdated(formattedDate);
+                } else {
+                    console.log("Failed to fetch card");
+                }
             }
         } catch (error) {
-            console.error('Error fetching cards:', error);
+            console.error('Error fetching saved card data:', error);
         } finally {
-
             setTimeout(() => {
                 setLoader(false);
-            }, 2000);
+            }, 300);
             setRefreshing(false);
         }
-    }
+    };
 
     const getCurrentDate = () => {
         const date = new Date();
@@ -56,14 +68,15 @@ export default function Home() {
     const onRefresh = React.useCallback(() => {
         setRefreshing(true);
         setLoader(true);
-        fetchCard();
+        fetchSavedCard();
         getCurrentDate();
-    }, []);
+    }, [isFocused]);
 
     useEffect(() => {
-        fetchCard();
+        fetchSavedCard();
         getCurrentDate();
-    }, []);
+        onRefresh();
+    }, [isFocused]);
 
     return (
         <SafeAreaView style={styles.background}>
@@ -95,7 +108,11 @@ export default function Home() {
                 <View style={styles.card}>
                     <View style={styles.cardContent}>
                         <View style={styles.cardTop}>
-                            <Text style={styles.uid}>{uid}</Text>
+                            <View>
+                                <Text style={styles.label}>{label}</Text>
+                                <Text style={styles.uid}>{uid}</Text>
+
+                            </View>
                             <Icon
                                 name="trash-outline"
                                 size={22}
@@ -107,7 +124,7 @@ export default function Home() {
                         </View>
                         <View style={styles.balContainer}>
                             <Text style={styles.bal}>PHP {bal}</Text>
-                            <Text style={styles.updateInfo}>Last updated: 28 Feb 2024 2:21 AM</Text>
+                            <Text style={styles.updateInfo}>Last updated: {lastUpdated}</Text>
                         </View>
                     </View>
                     <TouchableOpacity
@@ -234,9 +251,10 @@ const styles = StyleSheet.create({
     cardTop: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        // alignItems: 'center',
     },
     uid: {
+        position: 'relative',
+        bottom: 10,
         fontSize: 32,
         fontWeight: '900',
         color: '#262020',
@@ -248,9 +266,17 @@ const styles = StyleSheet.create({
         marginBottom: 10,
     },
     bal: {
+        position: 'absolute',
+        bottom: 0,
+        right: 3,
         fontSize: 48,
         fontWeight: '900',
         color: '#8d9f5f',
+    },
+    label: {
+        paddingTop: 5,
+        fontSize: 14,
+        color: '#262020',
     },
     updateInfo: {
         position: 'absolute',

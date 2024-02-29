@@ -1,15 +1,45 @@
 import { useNavigation } from '@react-navigation/native';
 import * as React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, TextInput } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, Modal, Pressable } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/Ionicons';
-
-
+import { useState } from 'react';
 
 export default function AddCard() {
     const navigation = useNavigation();
-    const [text, onChangeText] = React.useState('');
-    const [number, onChangeNumber] = React.useState('');
+    const [text, onChangeText] = useState('');
+    const [number, onChangeNumber] = useState('');
+    const [modalVisible, setModalVisible] = useState(false);
+
+    const saveCard = async () => {
+        console.log('Linking card');
+        try {
+            const response = await fetch(`https://mrt-system-be.onrender.com/cards/linkCard/${number}`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ user: 'linked' }),
+            });
+            const fetchedCard = await response.json();
+            if (response.ok) {
+                console.log('Card linked successfully');
+                const cardData = { uid: fetchedCard.uid, label: text };
+                AsyncStorage.setItem('savedCard', JSON.stringify(cardData));
+                navigation.navigate('Home' as never);
+                onChangeNumber('');
+                onChangeText('');
+            } else {
+                console.log('Failed to link card');
+                onChangeNumber('');
+                onChangeText('');
+                setModalVisible(true);
+            }
+        } catch (error) {
+            console.error('Error linking card:', error);
+        }
+    };
 
     return (
         <SafeAreaView style={styles.background}>
@@ -35,8 +65,16 @@ export default function AddCard() {
                         style={styles.input}
                         placeholder='* * * * * * * * * *'
                         placeholderTextColor='#a1aab8'
-                        onChangeText={onChangeNumber}
+                        onChangeText={(value) => {
+                            // Ensure only numbers are entered
+                            const regex = /^[0-9\b]+$/;
+                            if (regex.test(value) || value === '') {
+                                onChangeNumber(value);
+                            }
+                        }}
                         value={number}
+                        keyboardType="numeric"
+                        maxLength={10}
                     />
                 </View>
                 <View style={styles.inputContainer}>
@@ -52,10 +90,32 @@ export default function AddCard() {
             </View>
             <View style={styles.saveContainer}>
                 <TouchableOpacity
-                    onPress={() => navigation.navigate('Home' as never)}>
+                    onPress={saveCard}>
                     <Text style={styles.saveBtnText}>Save Card</Text>
                 </TouchableOpacity>
             </View>
+
+            {/* Modal for already linked card */}
+            <Modal
+                animationType="fade"
+                transparent={true}
+                visible={modalVisible}
+                onRequestClose={() => {
+                    setModalVisible(!modalVisible);
+                }}
+            >
+                <View style={styles.centeredView}>
+                    <View style={styles.modalView}>
+                        <Text style={styles.modalText}>This card is already linked.</Text>
+                        <TouchableOpacity
+                            style={[styles.button, styles.buttonClose]}
+                            onPress={() => setModalVisible(!modalVisible)}
+                        >
+                            <Text style={styles.textStyle}>Close</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            </Modal>
 
         </SafeAreaView >
     );
@@ -129,4 +189,42 @@ const styles = StyleSheet.create({
         color: '#262020',
         fontWeight: '500',
     },
+    // Modal styles
+    centeredView: {
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+        marginTop: 22
+    },
+    modalView: {
+        margin: 20,
+        backgroundColor: "#a8d5e5",
+        borderRadius: 10,
+        padding: 20,
+        alignItems: "center",
+        borderWidth: 1.5,
+    },
+    button: {
+        borderRadius: 10,
+        paddingHorizontal: 10,
+        paddingVertical: 5,
+        width: 200,
+    },
+    buttonClose: {
+        backgroundColor: "white",
+        borderWidth: 1.5,
+        borderBottomWidth: 4,
+        borderRightWidth: 4,
+    },
+    textStyle: {
+        color: "#262020",
+        fontWeight: "bold",
+        textAlign: "center"
+    },
+    modalText: {
+        color: '#262020',
+        fontWeight: '500',
+        marginBottom: 15,
+        textAlign: "center"
+    }
 });
