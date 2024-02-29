@@ -33,6 +33,17 @@ export default function Account() {
                     <Text style={styles.signOutBtnText}>Sign Out</Text>
                 </TouchableOpacity>
             </View>
+            <View style={styles.nameContainer}>
+                <Text style={styles.name}>Jhenna Dela Torre</Text>
+            </View>
+            <View style={styles.settingsContainer}>
+                <Text>Change PIN</Text>
+                <Text>Close Account</Text>
+                <Text>FAQs</Text>
+                <Text>About</Text>
+
+            </View>
+
         </SafeAreaView >
     );
 }
@@ -91,5 +102,25 @@ const styles = StyleSheet.create({
     signOutBtnText: {
         color: '#262020',
         fontWeight: '500',
+    },
+    nameContainer: {
+        alignItems: 'flex-start',
+        margin: 15,
+        marginHorizontal: 25,
+        marginBottom: 0,
+    },
+    name: {
+        justifyContent: 'center',
+        fontWeight: '900',
+        fontSize: 28,
+        color: '#262020',
+    },
+    settingsContainer: {
+        margin: 15,
+        padding: 10,
+        borderWidth: 1.5,
+        borderRadius: 10,
+        backgroundColor: 'white',
+        gap: 20,
     },
 });
