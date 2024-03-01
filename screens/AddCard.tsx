@@ -1,16 +1,30 @@
 import { useNavigation } from '@react-navigation/native';
 import * as React from 'react';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+// import AsyncStorage from '@react-native-async-storage/async-storage';
 import { View, Text, StyleSheet, TouchableOpacity, TextInput, Modal, Pressable } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/Ionicons';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import DeviceInfo from 'react-native-device-info';
+import { getUniqueId, getManufacturer } from 'react-native-device-info';
+
 
 export default function AddCard() {
     const navigation = useNavigation();
     const [text, onChangeText] = useState('');
     const [number, onChangeNumber] = useState('');
     const [modalVisible, setModalVisible] = useState(false);
+    const [deviceId, setDeviceId] = useState('');
+
+    const fetchDeviceId = async () => {
+        try {
+            const id = await DeviceInfo.getUniqueId();
+            setDeviceId(id);
+            console.log(id);
+        } catch (error) {
+            console.error('Error fetching device ID:', error);
+        }
+    };
 
     const saveCard = async () => {
         console.log('Linking card');
@@ -20,13 +34,10 @@ export default function AddCard() {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ user: 'linked' }),
+                body: JSON.stringify({ devId: deviceId }),
             });
-            const fetchedCard = await response.json();
             if (response.ok) {
                 console.log('Card linked successfully');
-                const cardData = { uid: fetchedCard.uid, label: text };
-                AsyncStorage.setItem('savedCard', JSON.stringify(cardData));
                 navigation.navigate('Home' as never);
                 onChangeNumber('');
                 onChangeText('');
@@ -40,6 +51,10 @@ export default function AddCard() {
             console.error('Error linking card:', error);
         }
     };
+
+    useEffect(() => {
+        fetchDeviceId();
+    }, []);
 
     return (
         <SafeAreaView style={styles.background}>
@@ -66,7 +81,6 @@ export default function AddCard() {
                         placeholder='* * * * * * * * * *'
                         placeholderTextColor='#a1aab8'
                         onChangeText={(value) => {
-                            // Ensure only numbers are entered
                             const regex = /^[0-9\b]+$/;
                             if (regex.test(value) || value === '') {
                                 onChangeNumber(value);

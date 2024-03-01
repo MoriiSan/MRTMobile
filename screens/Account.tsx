@@ -37,11 +37,10 @@ export default function Account() {
                 <Text style={styles.name}>Jhenna Dela Torre</Text>
             </View>
             <View style={styles.settingsContainer}>
-                <Text>Change PIN</Text>
-                <Text>Close Account</Text>
-                <Text>FAQs</Text>
-                <Text>About</Text>
-
+                <Text style={styles.settingItem}>Change PIN</Text>
+                <Text style={styles.settingItem}>Close Account</Text>
+                <Text style={styles.settingItem}>FAQs</Text>
+                <Text style={styles.settingItem}>About</Text>
             </View>
 
         </SafeAreaView >
@@ -122,5 +121,9 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         backgroundColor: 'white',
         gap: 20,
+
     },
+    settingItem: {
+        color: 'black',
+    }
 });

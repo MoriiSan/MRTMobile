@@ -1,14 +1,57 @@
 import { useNavigation } from '@react-navigation/native';
 import * as React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { useEffect, useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import Icon from 'react-native-vector-icons/Ionicons';
 
-
+interface Log {
+    charge: string;
+    dateTravel: string;
+}
 
 export default function Logs() {
     const navigation = useNavigation();
+    const [loading, setLoading] = useState(true);
+    const [logs, setLogs] = useState<Log[]>([]);
+
+    const fetchLogs = async () => {
+        try {
+            const uid = await AsyncStorage.getItem('selectedCardUid');
+            const response = await fetch(`http://localhost:8080/cards/${uid}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+            const fetchedCard = await response.json();
+            if (response.ok) {
+                setLogs(fetchedCard.logs);
+                console.log(fetchedCard.logs)
+                setLoading(false);
+            } else {
+                console.error('Failed to fetch logs');
+            }
+        } catch (error) {
+            console.error('Error fetching logs:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    if (loading) {
+        return (
+            <View style={styles.loadingContainer}>
+                <ActivityIndicator size="large" color="#fece2e" />
+            </View>
+        );
+    }
+
+    useEffect(() => {
+        fetchLogs();
+    }, []);
 
     return (
         <SafeAreaView style={styles.background}>
@@ -28,34 +71,22 @@ export default function Logs() {
                 <View style={{ flex: 1 }}></View>
             </View>
             <ScrollView>
-                <View style={styles.serviceContainer}>
-                    <View style={styles.leftSide}>
-                        <Icon
-                            name="navigate"
-                            size={15}
-                            style={styles.navigateIcon}
-                        />
-                        <View style={styles.serviceType}>
-                            <Text style={styles.serviceType}>MRT Rail Service Provider</Text>
-                            <Text style={styles.serviceDate}>February 29, 2024 08:14 PM</Text>
+                {logs.map((log, index) => (
+                    <View key={index} style={styles.serviceContainer}>
+                        <View style={styles.leftSide}>
+                            <Icon
+                                name="navigate"
+                                size={15}
+                                style={styles.navigateIcon}
+                            />
+                            <View style={styles.serviceType}>
+                                <Text style={styles.serviceType}>MRT Rail Service Provider</Text>
+                                <Text style={styles.serviceDate}>{log.dateTravel}</Text>
+                            </View>
                         </View>
+                        <Text style={styles.amount}>{log.charge}</Text>
                     </View>
-                    <Text style={styles.amount}>-P20.00</Text>
-                </View>
-                <View style={styles.serviceContainer}>
-                    <View style={styles.leftSide}>
-                        <Icon
-                            name="card"
-                            size={15}
-                            style={styles.cardIcon}
-                        />
-                        <View style={styles.serviceType}>
-                            <Text style={styles.serviceType}>Top Up</Text>
-                            <Text style={styles.serviceDate}>February 29, 2024 08:14 PM</Text>
-                        </View>
-                    </View>
-                    <Text style={styles.amountTopUp}>+P20.00</Text>
-                </View>
+                ))}
             </ScrollView>
         </SafeAreaView >
     );
@@ -145,5 +176,12 @@ const styles = StyleSheet.create({
         fontWeight: '700',
         fontSize: 18,
         color: '#96e945'
-    }
+    },
+    loadingContainer: {
+        ...StyleSheet.absoluteFillObject,
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        justifyContent: 'center',
+        alignItems: 'center',
+        zIndex: 100,
+    },
 });
