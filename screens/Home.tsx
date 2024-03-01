@@ -1,4 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { MMKV } from 'react-native-mmkv'
 import { useNavigation, useIsFocused } from '@react-navigation/native';
 import * as React from 'react';
 import { useEffect, useState } from 'react';
@@ -12,6 +13,8 @@ interface Card {
     uid: number;
     bal: number;
 }
+
+export const storage = new MMKV()
 
 export default function Home() {
     const navigation = useNavigation();
@@ -67,10 +70,10 @@ export default function Home() {
         }
     };
 
-    const navigateToLogs = async (uid: string) => {
+    const navigateToLogs = (uid: number) => {
         try {
-            await AsyncStorage.setItem('selectedCardUid', uid.toString());
-            console.log('UID saved successfully:', uid);
+            storage.set('selectedUid', uid.toString());
+            console.log('UID saved successfully:', storage.getString('selectedUid'));
             navigation.navigate('Transaction Logs' as never);
         } catch (error) {
             console.error('Error saving UID to AsyncStorage:', error);
@@ -146,7 +149,7 @@ export default function Home() {
                             </View>
                         </View>
                         <TouchableOpacity style={styles.logsBtn}
-                            onPress={() => navigateToLogs(card.uid.toString())}>
+                            onPress={() => navigateToLogs(card.uid)}>
                             <View style={styles.logsBtnLabel}>
                                 <Icon name="document-text-outline" size={14} style={{ color: '#262020' }} />
                                 <Text style={styles.logsBtnText}>Transaction Logs</Text>

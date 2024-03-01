@@ -5,6 +5,7 @@ import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator } from 'rea
 import { ScrollView } from 'react-native-gesture-handler';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { MMKV } from 'react-native-mmkv'
 import Icon from 'react-native-vector-icons/Ionicons';
 
 interface Log {
@@ -12,15 +13,19 @@ interface Log {
     dateTravel: string;
 }
 
+export const storage = new MMKV()
+
+
 export default function Logs() {
     const navigation = useNavigation();
-    const [loading, setLoading] = useState(true);
+    // const [loading, setLoading] = useState(true);
     const [logs, setLogs] = useState<Log[]>([]);
+
+    const uid = storage.getString('selectedUid')
 
     const fetchLogs = async () => {
         try {
-            const uid = await AsyncStorage.getItem('selectedCardUid');
-            const response = await fetch(`http://localhost:8080/cards/${uid}`, {
+            const response = await fetch(`https://mrt-system-be.onrender.com/cards/${uid}`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
@@ -29,25 +34,21 @@ export default function Logs() {
             const fetchedCard = await response.json();
             if (response.ok) {
                 setLogs(fetchedCard.logs);
-                console.log(fetchedCard.logs)
-                setLoading(false);
             } else {
                 console.error('Failed to fetch logs');
             }
         } catch (error) {
             console.error('Error fetching logs:', error);
-        } finally {
-            setLoading(false);
         }
     };
 
-    if (loading) {
+    /* if (loading) {
         return (
             <View style={styles.loadingContainer}>
                 <ActivityIndicator size="large" color="#fece2e" />
             </View>
         );
-    }
+    } */
 
     useEffect(() => {
         fetchLogs();
@@ -70,6 +71,16 @@ export default function Logs() {
                 </Text>
                 <View style={{ flex: 1 }}></View>
             </View>
+            <View style={styles.uidContainer}>
+                <Icon
+                    name="card"
+                    size={20}
+                    style={{
+                        color: '#262020',
+                    }}
+                />
+                <Text style={styles.uidTitle}>{uid}</Text>
+            </View>
             <ScrollView>
                 {logs.map((log, index) => (
                     <View key={index} style={styles.serviceContainer}>
@@ -84,7 +95,7 @@ export default function Logs() {
                                 <Text style={styles.serviceDate}>{log.dateTravel}</Text>
                             </View>
                         </View>
-                        <Text style={styles.amount}>{log.charge}</Text>
+                        <Text style={styles.amount}>-PHP {log.charge}</Text>
                     </View>
                 ))}
             </ScrollView>
@@ -122,6 +133,26 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         fontSize: 16,
         fontWeight: '500',
+    },
+    uidContainer: {
+        borderRadius: 10,
+        borderWidth: 1.5,
+        margin: 15,
+        marginBottom: 0,
+        padding: 10,
+        flexDirection: 'row',
+        justifyContent: 'flex-start',
+        alignItems: 'center',
+        backgroundColor: 'white',
+    },
+    uidTitle: {
+        /* margin: 15,
+        marginBottom: 0,
+        padding: 10,
+        flexDirection: 'row', */
+        fontSize: 18,
+        fontWeight: '600',
+        color: '#262020',
     },
     serviceContainer: {
         borderRadius: 10,
