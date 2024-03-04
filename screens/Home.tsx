@@ -57,8 +57,6 @@ export default function Home() {
             const fetchedCard = await response.json();
             if (response.ok) {
                 setCards(fetchedCard)
-                /* setUid(fetchedCard.uid)
-                setBal(fetchedCard.bal); */
                 setLastUpdated(formattedDate);
             } else {
                 console.log("Failed to fetch card");
@@ -73,24 +71,25 @@ export default function Home() {
         }
     };
 
-    // const removeLinkedCard = async () => {
-    //     try {
-    //         const response = await fetch(`https://mrt-system-be.onrender.com/cards/linkedCards/${devId}`, {
-    //             method: 'PATCH',
-    //             headers: {
-    //                 'Content-Type': 'application/json',
-    //             },
-    //         });
-    //         const linkedCard = await response.json();
-    //         if (response.ok) {
-                
-    //         } else {
-    //             console.log("Failed to remove card");
-    //         }
-    //     } catch (error) {
-    //         console.error('Error removing linked card:', error);
-    //     }
-    // };
+    const removeLinkedCard = async (uid: number) => {
+        try {
+            const response = await fetch(`https://mrt-system-be.onrender.com/cards/linkedCards/${uid}`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ devId: '' })
+            });
+            const linkedCard = await response.json();
+            if (response.ok) {
+
+            } else {
+                console.log("Failed to remove card");
+            }
+        } catch (error) {
+            console.error('Error removing linked card:', error);
+        }
+    };
 
     const navigateToLogs = (uid: number) => {
         try {
@@ -159,13 +158,20 @@ export default function Home() {
                 {cards.map((card, index) => (
                     <View key={index} style={styles.card}>
                         <View style={styles.cardContent}>
-                            <View style={styles.cardTop}>
+                            <TouchableOpacity
+                                style={styles.cardTop}
+                                onPress={() => navigateToLogs(card.uid)}
+                            >
                                 <View>
                                     <Text style={styles.label}>Label</Text>
                                     <Text style={styles.uid}>{card.uid}</Text>
                                 </View>
-                                <Icon name="trash-outline" size={22} style={{ color: '#a1aab8', marginTop: 8 }} />
-                            </View>
+                                <TouchableOpacity
+                                    onPress={() => removeLinkedCard(card.uid)}
+                                >
+                                    <Icon name="trash-outline" size={22} style={{ color: '#a1aab8', marginTop: 8 }} />
+                                </TouchableOpacity>
+                            </TouchableOpacity>
                             <View style={styles.balContainer}>
                                 <Text style={styles.bal}>PHP {card.bal}</Text>
                                 <Text style={styles.updateInfo}>Last updated: {lastUpdated}</Text>
