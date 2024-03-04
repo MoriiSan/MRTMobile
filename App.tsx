@@ -9,23 +9,30 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
 import { Entypo } from '@expo/vector-icons';
 import { Text, View } from 'react-native';
+import DeviceInfo from 'react-native-device-info';
+import { useEffect, useState } from 'react';
 
-const Tab = createBottomTabNavigator();
+/* export const DeviceComponent = () => {
+
+  const [deviceId, setDeviceId] = useState('');
+
+  const fetchDeviceId = async () => {
+    try {
+      const id = await DeviceInfo.getUniqueId();
+      setDeviceId(id);
+      console.log(id);
+    } catch (error) {
+      console.error('Error fetching device ID:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchDeviceId();
+  }, []);
+
+} */
+
 const Stack = createStackNavigator();
-const screenOptions = {
-  tabBarShowLabel: false,
-  headershown: false,
-  tabBarStyle: {
-    position: "absolute",
-    bottom: 0,
-    right: 0,
-    left: 0,
-    elevation: 0,
-    height: 60,
-    background: "#fff"
-  }
-}
-
 
 export default function App() {
   return (
@@ -38,7 +45,7 @@ export default function App() {
         <Stack.Screen
           name="Home"
           component={Home}
-          options={{ headerShown: false }} 
+          options={{ headerShown: false }}
         />
         <Stack.Screen
           name="Account"

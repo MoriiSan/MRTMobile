@@ -34,7 +34,8 @@ export default function Home() {
         try {
             const id = await DeviceInfo.getUniqueId();
             setDeviceId(id);
-            // console.log(id)
+            // console.log('home:', id)
+            return id;
         } catch (error) {
             console.error('Error fetching device ID:', error);
         }
@@ -43,9 +44,11 @@ export default function Home() {
     const fetchSavedCard = async () => {
         const date = new Date();
         const formattedDate = `${date.getDate()} ${getMonthName(date.getMonth())} ${date.getFullYear()} ${date.getHours()}:${date.getMinutes() < 10 ? '0' : ''}${date.getMinutes()} ${date.getHours() >= 12 ? 'PM' : 'AM'}`;
+        const id = await fetchDeviceId();
+        if (!id) return;
 
         try {
-            const response = await fetch(`https://mrt-system-be.onrender.com/cards/linkedCards/${deviceId}`, {
+            const response = await fetch(`https://mrt-system-be.onrender.com/cards/linkedCards/${id}`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
@@ -70,10 +73,29 @@ export default function Home() {
         }
     };
 
+    // const removeLinkedCard = async () => {
+    //     try {
+    //         const response = await fetch(`https://mrt-system-be.onrender.com/cards/linkedCards/${devId}`, {
+    //             method: 'PATCH',
+    //             headers: {
+    //                 'Content-Type': 'application/json',
+    //             },
+    //         });
+    //         const linkedCard = await response.json();
+    //         if (response.ok) {
+                
+    //         } else {
+    //             console.log("Failed to remove card");
+    //         }
+    //     } catch (error) {
+    //         console.error('Error removing linked card:', error);
+    //     }
+    // };
+
     const navigateToLogs = (uid: number) => {
         try {
             storage.set('selectedUid', uid.toString());
-            console.log('UID saved successfully:', storage.getString('selectedUid'));
+            // console.log('UID saved successfully:', storage.getString('selectedUid'));
             navigation.navigate('Transaction Logs' as never);
         } catch (error) {
             console.error('Error saving UID to AsyncStorage:', error);
@@ -92,6 +114,7 @@ export default function Home() {
     }
 
     const onRefresh = React.useCallback(() => {
+        // fetchDeviceId();
         setRefreshing(true);
         setLoader(true);
         fetchSavedCard();
@@ -99,7 +122,7 @@ export default function Home() {
     }, [isFocused]);
 
     useEffect(() => {
-        fetchDeviceId();
+        // fetchDeviceId();
         fetchSavedCard();
         getCurrentDate();
         onRefresh();

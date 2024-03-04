@@ -11,6 +11,8 @@ import Icon from 'react-native-vector-icons/Ionicons';
 interface Log {
     charge: string;
     dateTravel: string;
+    topUp: string;
+    dateLoaded: string;
 }
 
 export const storage = new MMKV()
@@ -92,13 +94,23 @@ export default function Logs() {
                             />
                             <View style={styles.serviceType}>
                                 <Text style={styles.serviceType}>MRT Rail Service Provider</Text>
-                                <Text style={styles.serviceDate}>{log.dateTravel}</Text>
+                                {(log.dateTravel && log.charge) ? (
+                                    <>
+                                        <Text style={styles.serviceDate}>{log.dateTravel}</Text>
+                                        <Text style={styles.amount}>-PHP {log.charge}</Text>
+                                    </>
+                                ) : (
+                                    <>
+                                        <Text style={styles.serviceDate}>{log.dateLoaded}</Text>
+                                        <Text style={styles.amountTopUp}>+PHP {log.topUp}</Text>
+                                    </>
+                                )}
                             </View>
                         </View>
-                        <Text style={styles.amount}>-PHP {log.charge}</Text>
                     </View>
                 ))}
             </ScrollView>
+
         </SafeAreaView >
     );
 }
