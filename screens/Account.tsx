@@ -2,12 +2,24 @@ import { useNavigation } from '@react-navigation/native';
 import * as React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { MMKV } from 'react-native-mmkv'
 import Icon from 'react-native-vector-icons/Ionicons';
 
-
+export const storage = new MMKV()
 
 export default function Account() {
     const navigation = useNavigation();
+
+    const userPin = storage.getString('user_pin');
+    console.log('account:', userPin);
+    const emptyPin = '';
+    const nickname = storage.getString('nickname');
+
+
+    const handleCloseAccount = () => {
+        storage.set('user_pin', emptyPin)
+        navigation.navigate('Welcome' as never);
+    }
 
     return (
         <SafeAreaView style={styles.background}>
@@ -34,11 +46,14 @@ export default function Account() {
                 </TouchableOpacity>
             </View>
             <View style={styles.nameContainer}>
-                <Text style={styles.name}>Jhenna Dela Torre</Text>
+                <Text style={styles.name}>{nickname}</Text>
             </View>
             <View style={styles.settingsContainer}>
                 <Text style={styles.settingItem}>Change PIN</Text>
-                <Text style={styles.settingItem}>Close Account</Text>
+                <TouchableOpacity
+                    onPress={handleCloseAccount}>
+                    <Text style={styles.settingItem}>Close Account</Text>
+                </TouchableOpacity>
                 <Text style={styles.settingItem}>FAQs</Text>
                 <Text style={styles.settingItem}>About</Text>
             </View>

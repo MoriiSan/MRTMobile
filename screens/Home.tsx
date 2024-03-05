@@ -1,13 +1,14 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { MMKV } from 'react-native-mmkv'
 import { useNavigation, useIsFocused } from '@react-navigation/native';
 import * as React from 'react';
 import { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, RefreshControl, ActivityIndicator, Animated } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, RefreshControl, ActivityIndicator, Animated, Modal } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import DeviceInfo from 'react-native-device-info';
 import Icon from 'react-native-vector-icons/Ionicons';
+import { BackHandler } from 'react-native';
+
 
 interface Card {
     uid: number;
@@ -20,15 +21,18 @@ export default function Home() {
     const navigation = useNavigation();
     const isFocused = useIsFocused();
     const [cards, setCards] = useState<Card[]>([]);
-    /*     const [uid, setUid] = useState('');
-        const [bal, setBal] = useState('');
-        const [label, setLabel] = useState(''); */
-    const [deviceId, setDeviceId] = useState('');
 
+    /*  const [label, setLabel] = useState(''); */
+    const [deviceId, setDeviceId] = useState('');
+    const [modalVisible, setModalVisible] = useState(false);
+    const [modalDelete, setModalDelete] = useState(false);
     const [refreshing, setRefreshing] = useState(false);
     const [loader, setLoader] = useState(false);
     const [currentDate, setCurrentDate] = useState('');
     const [lastUpdated, setLastUpdated] = useState('');
+
+    const nickname = storage.getString('nickname');
+
 
     const fetchDeviceId = async () => {
         try {
@@ -58,31 +62,29 @@ export default function Home() {
             if (response.ok) {
                 setCards(fetchedCard)
                 setLastUpdated(formattedDate);
+                setLoader(false);
             } else {
                 console.log("Failed to fetch card");
             }
         } catch (error) {
             console.error('Error fetching saved card data:', error);
         } finally {
-            setTimeout(() => {
-                setLoader(false);
-            }, 300);
             setRefreshing(false);
         }
     };
 
     const removeLinkedCard = async (uid: number) => {
         try {
-            const response = await fetch(`https://mrt-system-be.onrender.com/cards/linkedCards/${uid}`, {
+            const response = await fetch(`https://mrt-system-be.onrender.com/cards/remove-card/${uid}`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ devId: '' })
             });
-            const linkedCard = await response.json();
             if (response.ok) {
-
+                fetchSavedCard();
+                setModalVisible(true)
+                console.log('card successfully unlinked!')
             } else {
                 console.log("Failed to remove card");
             }
@@ -113,19 +115,35 @@ export default function Home() {
     }
 
     const onRefresh = React.useCallback(() => {
-        // fetchDeviceId();
         setRefreshing(true);
-        setLoader(true);
         fetchSavedCard();
         getCurrentDate();
-    }, [isFocused]);
+    }, []);
 
     useEffect(() => {
-        // fetchDeviceId();
         fetchSavedCard();
         getCurrentDate();
         onRefresh();
+        setLoader(true)
     }, [isFocused]);
+
+    useEffect(() => {
+        const backAction = () => {
+            if (navigation.isFocused()) {
+                BackHandler.exitApp();
+                return true;
+            }
+            return false;
+        };
+
+        const backHandler = BackHandler.addEventListener(
+            'hardwareBackPress',
+            backAction
+        );
+
+        return () => backHandler.remove();
+    }, [navigation]);
+
 
     return (
         <SafeAreaView style={styles.background}>
@@ -137,7 +155,7 @@ export default function Home() {
                 >Hello
                     <Text
                         style={styles.name}
-                    >, Jhenna!</Text>
+                    >, {nickname}</Text>
                 </Text>
                 <TouchableOpacity
                     style={styles.profileBtn}
@@ -152,16 +170,58 @@ export default function Home() {
                 </TouchableOpacity>
 
             </View>
+
+             {/* modal confirm delete */}
+             <Modal
+                animationType="fade"
+                transparent={true}
+                visible={modalVisible}
+                onRequestClose={() => {
+                    setModalDelete(!modalDelete);
+                }}
+            >
+                <View style={styles.centeredView}>
+                    <View style={styles.modalView}>
+                        <Text style={styles.modalText}>Remove card?</Text>
+                        <TouchableOpacity
+                            style={[styles.button, styles.buttonClose]}
+                            onPress={() => setModalDelete(!modalDelete)}
+                        >
+                            <Text style={styles.textStyle}>Confirm</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            </Modal>
+
+            {/* modal successfully unlinked card */}
+            <Modal
+                animationType="fade"
+                transparent={true}
+                visible={modalVisible}
+                onRequestClose={() => {
+                    setModalVisible(!modalVisible);
+                }}
+            >
+                <View style={styles.centeredView}>
+                    <View style={styles.modalView}>
+                        <Text style={styles.modalText}>Card successfully removed.</Text>
+                        <TouchableOpacity
+                            style={[styles.button, styles.buttonClose]}
+                            onPress={() => setModalVisible(!modalVisible)}
+                        >
+                            <Text style={styles.textStyle}>Close</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            </Modal>
+
             {/* card ///////////////// */}
             <ScrollView refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh}
                 style={{ flexGrow: 1 }} />}>
                 {cards.map((card, index) => (
                     <View key={index} style={styles.card}>
                         <View style={styles.cardContent}>
-                            <TouchableOpacity
-                                style={styles.cardTop}
-                                onPress={() => navigateToLogs(card.uid)}
-                            >
+                            <View style={styles.cardTop}>
                                 <View>
                                     <Text style={styles.label}>Label</Text>
                                     <Text style={styles.uid}>{card.uid}</Text>
@@ -171,7 +231,7 @@ export default function Home() {
                                 >
                                     <Icon name="trash-outline" size={22} style={{ color: '#a1aab8', marginTop: 8 }} />
                                 </TouchableOpacity>
-                            </TouchableOpacity>
+                            </View>
                             <View style={styles.balContainer}>
                                 <Text style={styles.bal}>PHP {card.bal}</Text>
                                 <Text style={styles.updateInfo}>Last updated: {lastUpdated}</Text>
@@ -265,7 +325,7 @@ const styles = StyleSheet.create({
     },
     ////////////////////////////
     card: {
-        backgroundColor: '#fcf4e7',
+        backgroundColor: 'white',
         padding: 15,
         paddingTop: 5,
         borderRadius: 10,
@@ -368,5 +428,42 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         zIndex: 100,
     },
-
+    // Modal styles
+    centeredView: {
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+        backgroundColor: 'rgba(0, 0, 0, 0.3)',
+    },
+    modalView: {
+        margin: 20,
+        backgroundColor: "#a8d5e5",
+        borderRadius: 10,
+        padding: 20,
+        alignItems: "center",
+        borderWidth: 1.5,
+    },
+    button: {
+        borderRadius: 10,
+        paddingHorizontal: 10,
+        paddingVertical: 5,
+        width: 200,
+    },
+    buttonClose: {
+        backgroundColor: "white",
+        borderWidth: 1.5,
+        borderBottomWidth: 4,
+        borderRightWidth: 4,
+    },
+    textStyle: {
+        color: "#262020",
+        fontWeight: "bold",
+        textAlign: "center"
+    },
+    modalText: {
+        color: '#262020',
+        fontWeight: '500',
+        marginBottom: 15,
+        textAlign: "center"
+    },
 });

@@ -6,8 +6,6 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { useEffect, useState } from 'react';
 import DeviceInfo from 'react-native-device-info';
-import { getUniqueId, getManufacturer } from 'react-native-device-info';
-
 
 export default function AddCard() {
     const navigation = useNavigation();
@@ -20,7 +18,7 @@ export default function AddCard() {
         try {
             const id = await DeviceInfo.getUniqueId();
             setDeviceId(id);
-            console.log(id);
+            // console.log(id);
         } catch (error) {
             console.error('Error fetching device ID:', error);
         }
