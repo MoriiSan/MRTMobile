@@ -3,24 +3,59 @@ import * as React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MMKV } from 'react-native-mmkv'
+import DeviceInfo from 'react-native-device-info';
 import Icon from 'react-native-vector-icons/Ionicons';
+import { useEffect, useState } from 'react';
 
 export const storage = new MMKV()
 
 export default function Account() {
     const navigation = useNavigation();
+    const [deviceId, setDeviceId] = useState('');
+
+    const fetchDeviceId = async () => {
+        try {
+            const id = await DeviceInfo.getUniqueId();
+            setDeviceId(id);
+            console.log(id);
+        } catch (error) {
+            console.error('Error fetching device ID:', error);
+        }
+    };
 
     const userPin = storage.getString('user_pin');
     console.log('account:', userPin);
     const emptyPin = '';
     const nickname = storage.getString('nickname');
 
+    const removeAllCards = async () => {
+        try {
+            const response = await fetch(`https://mrt-system-be.onrender.com/cards/remove-all-cards/${deviceId}`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+            if (response.ok) {
+                console.log('')
+            } else {
+                console.log("Failed to remove all cards");
+            }
+        } catch (error) {
+            console.error('Error removing linked cards:', error);
+        }
+    };
 
     const handleCloseAccount = () => {
+        removeAllCards();
         storage.set('user_pin', emptyPin)
         navigation.navigate('Welcome' as never);
     }
 
+    useEffect(() => {
+        fetchDeviceId();
+    }, []);
+    
     return (
         <SafeAreaView style={styles.background}>
             <View style={styles.header}>

@@ -6,6 +6,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { useEffect, useState } from 'react';
 import DeviceInfo from 'react-native-device-info';
+import { Camera, useCameraDevice, useCameraPermission, useCodeScanner } from 'react-native-vision-camera';
 
 export default function AddCard() {
     const navigation = useNavigation();
@@ -13,6 +14,10 @@ export default function AddCard() {
     const [number, onChangeNumber] = useState('');
     const [modalVisible, setModalVisible] = useState(false);
     const [deviceId, setDeviceId] = useState('');
+    const { hasPermission, requestPermission } = useCameraPermission()
+    const [cameraVisible, setCameraVisible] = useState(false);
+
+    const device = useCameraDevice('back')
 
     const fetchDeviceId = async () => {
         try {
@@ -50,6 +55,33 @@ export default function AddCard() {
         }
     };
 
+    const toggleCamera = async () => {
+        console.log('QR clicked')
+        if (!hasPermission) {
+            if (await requestPermission()) {
+                setCameraVisible(!cameraVisible); // Ensure the camera is shown when toggling
+            }
+        } else if (hasPermission) {
+            setCameraVisible(!cameraVisible); // Ensure the camera is shown when toggling
+        }
+    };
+    const isValidBeepCard = (value: string) => {
+        const regex = /^[0-9\b]+$/;
+        return regex.test(value);
+    };
+
+    const codeScanner = useCodeScanner({
+        codeTypes: ['qr', 'ean-13'],
+        onCodeScanned: (codes) => {
+            const { value } = codes[0];
+            if (isValidBeepCard(value!.toString())) {
+                console.log(`Scanned ${value}!`)
+                onChangeNumber(value!)
+                setCameraVisible(false)
+            }
+        }
+    })
+
     useEffect(() => {
         fetchDeviceId();
     }, []);
@@ -70,6 +102,10 @@ export default function AddCard() {
                     Link a MRT Card
                 </Text>
                 <View style={{ flex: 1 }}></View>
+                <TouchableOpacity
+                    onPress={() => toggleCamera()}>
+                    <Text style={{ color: 'black', marginRight: 10 }}>QR</Text>
+                </TouchableOpacity>
             </View>
             <View >
                 <View style={styles.inputContainer}>
@@ -100,6 +136,20 @@ export default function AddCard() {
                     />
                 </View>
             </View>
+
+            {cameraVisible &&
+                <View style={styles.cameraContainer}>
+                    <Camera
+                        style={styles.camera}
+                        device={device!}
+                        isActive={true}
+                        codeScanner={codeScanner}
+                    />
+                    {/* <Text style={{ color: 'black' }}>
+                </Text> */}
+                </View>
+            }
+
             <View style={styles.saveContainer}>
                 <TouchableOpacity
                     onPress={saveCard}>
@@ -134,6 +184,18 @@ export default function AddCard() {
 }
 
 const styles = StyleSheet.create({
+    cameraContainer: {
+        flex: 1,
+        position: 'relative',
+        overflow: 'hidden', // Ensure the scan region is contained within this container
+        margin: 10,
+        marginHorizontal: 15,
+        borderRadius: 10,
+    },
+    camera: {
+        width: '100%',
+        height: '100%',
+    },
     background: {
         flex: 1,
         backgroundColor: '#fcf4e7',

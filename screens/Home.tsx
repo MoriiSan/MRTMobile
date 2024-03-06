@@ -15,12 +15,15 @@ interface Card {
     bal: number;
 }
 
+const SESSION_TIMEOUT_DURATION = 0.1 * 60 * 1000; 
+
 export const storage = new MMKV()
 
 export default function Home() {
     const navigation = useNavigation();
     const isFocused = useIsFocused();
     const [cards, setCards] = useState<Card[]>([]);
+    const [selectedCardUid, setSelectedCardUid] = useState<number | null>(null);
 
     /*  const [label, setLabel] = useState(''); */
     const [deviceId, setDeviceId] = useState('');
@@ -33,6 +36,10 @@ export default function Home() {
 
     const nickname = storage.getString('nickname');
 
+    const openDeleteModal = (uid: number) => {
+        setSelectedCardUid(uid);
+        setModalDelete(true);
+    };
 
     const fetchDeviceId = async () => {
         try {
@@ -84,6 +91,7 @@ export default function Home() {
             if (response.ok) {
                 fetchSavedCard();
                 setModalVisible(true)
+                setModalDelete(!modalDelete)
                 console.log('card successfully unlinked!')
             } else {
                 console.log("Failed to remove card");
@@ -171,21 +179,25 @@ export default function Home() {
 
             </View>
 
-             {/* modal confirm delete */}
-             <Modal
+            {/* modal confirm delete */}
+            <Modal
                 animationType="fade"
                 transparent={true}
-                visible={modalVisible}
+                visible={modalDelete}
                 onRequestClose={() => {
                     setModalDelete(!modalDelete);
                 }}
             >
                 <View style={styles.centeredView}>
                     <View style={styles.modalView}>
-                        <Text style={styles.modalText}>Remove card?</Text>
+                        <Text style={styles.modalText}>Remove card {selectedCardUid}?</Text>
                         <TouchableOpacity
                             style={[styles.button, styles.buttonClose]}
-                            onPress={() => setModalDelete(!modalDelete)}
+                            onPress={() => {
+                                if (selectedCardUid !== null) {
+                                    removeLinkedCard(selectedCardUid);
+                                }
+                            }}
                         >
                             <Text style={styles.textStyle}>Confirm</Text>
                         </TouchableOpacity>
@@ -215,6 +227,8 @@ export default function Home() {
                 </View>
             </Modal>
 
+            {/* removeLinkedCard(card.uid) */}
+
             {/* card ///////////////// */}
             <ScrollView refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh}
                 style={{ flexGrow: 1 }} />}>
@@ -227,7 +241,7 @@ export default function Home() {
                                     <Text style={styles.uid}>{card.uid}</Text>
                                 </View>
                                 <TouchableOpacity
-                                    onPress={() => removeLinkedCard(card.uid)}
+                                    onPress={() => openDeleteModal(card.uid)}
                                 >
                                     <Icon name="trash-outline" size={22} style={{ color: '#a1aab8', marginTop: 8 }} />
                                 </TouchableOpacity>
