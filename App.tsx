@@ -5,6 +5,7 @@ import Home from "./screens/Home";
 import Account from "./screens/Account";
 import Logs from "./screens/Logs";
 import AddCard from "./screens/AddCard";
+import Scan from "./screens/Scan";
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 
@@ -13,7 +14,7 @@ const Stack = createStackNavigator();
 export default function App() {
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="Add Card">
+      <Stack.Navigator initialRouteName="Scan">
         <Stack.Screen
           name="Welcome"
           component={Welcome}
@@ -40,6 +41,11 @@ export default function App() {
         <Stack.Screen
           name="Add Card"
           component={AddCard}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="Scan"
+          component={Scan}
           options={{ headerShown: false }}
         />
       </Stack.Navigator>

@@ -15,7 +15,7 @@ interface Card {
     bal: number;
 }
 
-const SESSION_TIMEOUT_DURATION = 0.1 * 60 * 1000; 
+const SESSION_TIMEOUT_DURATION = 0.1 * 60 * 1000;
 
 export const storage = new MMKV()
 
@@ -111,6 +111,17 @@ export default function Home() {
         }
     };
 
+    const faveCard = (uid: number) => {
+        try {
+            storage.set('faveCard', uid.toString());
+            onRefresh();
+        } catch (error) {
+            console.error('Error saving fave card:', error);
+        }
+    };
+
+    const fave = storage.getString('faveCard')
+
     const getCurrentDate = () => {
         const date = new Date();
         const formattedDate = `${date.getDate()} ${getMonthName(date.getMonth())} ${date.getFullYear()}`;
@@ -156,15 +167,17 @@ export default function Home() {
     return (
         <SafeAreaView style={styles.background}>
             <View style={styles.header}>
-                <Text style={styles.date}
-                >{currentDate}</Text>
-                <Text
-                    style={styles.hello}
-                >Hello
-                    <Text
-                        style={styles.name}
-                    >, {nickname}</Text>
+                <Text style={styles.date}>{currentDate}</Text>
+                <Text style={styles.hello}>Hello
+                    <Text style={styles.name}>, {nickname}</Text>
                 </Text>
+                <TouchableOpacity style={styles.qrcontainer}
+                    onPress={() => navigation.navigate('Scan' as never)}>
+                    <Icon
+                        name="qr-code-outline"
+                        size={35}
+                        style={styles.icon} />
+                </TouchableOpacity>
                 <TouchableOpacity
                     style={styles.profileBtn}
                     onPress={() => navigation.navigate('Account' as never)}>
@@ -251,14 +264,28 @@ export default function Home() {
                                 <Text style={styles.updateInfo}>Last updated: {lastUpdated}</Text>
                             </View>
                         </View>
-                        <TouchableOpacity style={styles.logsBtn}
-                            onPress={() => navigateToLogs(card.uid)}>
-                            <View style={styles.logsBtnLabel}>
-                                <Icon name="document-text-outline" size={14} style={{ color: '#262020' }} />
-                                <Text style={styles.logsBtnText}>Transaction Logs</Text>
-                            </View>
-                            <Icon name="arrow-forward-outline" size={20} style={{ color: '#262020' }} />
-                        </TouchableOpacity>
+                        <View style={styles.btns}>
+                            {fave === card.uid.toString() ? (
+                                <TouchableOpacity style={styles.faveBtn}>
+                                    <Icon name="star" size={15} style={{ color: '#262020' }} />
+                                </TouchableOpacity>
+                            ) : (
+                                <TouchableOpacity
+                                    style={styles.faveBtn}
+                                    onPress={() => faveCard(card.uid)}
+                                >
+                                    <Icon name="star-outline" size={15} style={{ color: '#262020' }} />
+                                </TouchableOpacity>
+                            )}
+                            <TouchableOpacity style={styles.logsBtn}
+                                onPress={() => navigateToLogs(card.uid)}>
+                                <View style={styles.logsBtnLabel}>
+                                    <Icon name="document-text-outline" size={14} style={{ color: '#262020' }} />
+                                    <Text style={styles.logsBtnText}>Transaction Logs</Text>
+                                </View>
+                                <Icon name="arrow-forward-outline" size={20} style={{ color: '#262020' }} />
+                            </TouchableOpacity>
+                        </View>
                     </View>
                 ))}
                 <View style={styles.emptyContainer}>
@@ -337,6 +364,20 @@ const styles = StyleSheet.create({
         color: '#262020',
         fontSize: 14,
     },
+    qrcontainer: {
+        position: 'absolute',
+        top: 15,
+        right: 20,
+        flexDirection: 'row',
+        alignItems: 'center',
+        padding: 5,
+        borderRadius: 10,
+        backgroundColor: 'white',
+        borderWidth: 1.5,
+        borderBottomWidth: 4,
+        borderRightWidth: 4,
+
+    },
     ////////////////////////////
     card: {
         backgroundColor: 'white',
@@ -396,7 +437,22 @@ const styles = StyleSheet.create({
         color: '#a1aab8',
 
     },
+    btns: {
+        flexDirection: 'row',
+        gap: 10,
+    },
+    faveBtn: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        paddingVertical: 8,
+        paddingHorizontal: 12,
+        borderWidth: 1.5,
+        borderRadius: 10,
+        backgroundColor: '#fece2e',
+    },
     logsBtn: {
+        flex: 1,
         flexDirection: 'row',
         justifyContent: 'space-between',
         paddingVertical: 8,

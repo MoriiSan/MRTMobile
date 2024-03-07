@@ -11,6 +11,7 @@ import Home from "./screens/Home";
 import Account from "./screens/Account";
 import Logs from "./screens/Logs";
 import AddCard from "./screens/AddCard";
+import Scan from "./screens/Scan";
 
 AppRegistry.registerComponent(appName, () => App);
 
@@ -22,4 +23,5 @@ export {
     Account,
     Logs,
     AddCard,
+    Scan,
 }
