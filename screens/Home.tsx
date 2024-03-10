@@ -92,6 +92,7 @@ export default function Home() {
                 fetchSavedCard();
                 setModalVisible(true)
                 setModalDelete(!modalDelete)
+                storage.set('faveCard', '');
                 console.log('card successfully unlinked!')
             } else {
                 console.log("Failed to remove card");
@@ -171,8 +172,11 @@ export default function Home() {
                 <Text style={styles.hello}>Hello
                     <Text style={styles.name}>, {nickname}</Text>
                 </Text>
-                <TouchableOpacity style={styles.qrcontainer}
-                    onPress={() => navigation.navigate('Scan' as never)}>
+                <TouchableOpacity
+                    style={styles.qrcontainer}
+                    onPress={() => fave ? navigation.navigate('Scan' as never) : null}
+                    disabled={!fave}
+                >
                     <Icon
                         name="qr-code-outline"
                         size={35}

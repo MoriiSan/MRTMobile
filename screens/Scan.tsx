@@ -21,6 +21,9 @@ export default function Scan() {
     const [totalFare, setTotalFare] = useState<number>(0);
     const [bal, setBal] = useState<number>(0);
     const [finalBal, setFinalBal] = useState<number>(0);
+    const [fetchUid, setFetchUid] = useState();
+    const [fetchBal, setFetchBal] = useState();
+    const [lastUpdated, setLastUpdated] = useState('');
 
     const device = useCameraDevice('back')
 
@@ -232,6 +235,20 @@ export default function Scan() {
                     <Text style={{ color: 'black', marginRight: 10 }}>Scan</Text>
                 </TouchableOpacity>
             </View>
+            <View style={styles.card}>
+                <View style={styles.cardContent}>
+                    <View style={styles.cardTop}>
+                        <View>
+                            <Text style={styles.label}>Label</Text>
+                            <Text style={styles.uid}>{fetchUid}</Text>
+                        </View>
+                    </View>
+                    <View style={styles.balContainer}>
+                        <Text style={styles.bal}>PHP {fetchBal}</Text>
+                        <Text style={styles.updateInfo}>Last updated: {lastUpdated}</Text>
+                    </View>
+                </View>
+            </View>
             {!cameraVisible &&
                 <>
                     <TouchableOpacity
@@ -375,5 +392,64 @@ const styles = StyleSheet.create({
         color: 'black',
         fontWeight: '900',
         fontSize: 24,
+    },
+    //card
+    card: {
+        backgroundColor: '#fece2e',
+        padding: 15,
+        paddingTop: 5,
+        borderRadius: 10,
+        margin: 15,
+        marginBottom: 0,
+        height: 200,
+        borderWidth: 1.5,
+        borderBottomWidth: 4,
+        borderRightWidth: 4,
+        borderColor: '#262020',
+        flexDirection: 'column',
+        justifyContent: 'space-between',
+    },
+    cardContent: {
+        flex: 1,
+        flexDirection: 'column',
+        justifyContent: 'space-between',
+    },
+    cardTop: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+    },
+    uid: {
+        position: 'relative',
+        bottom: 10,
+        fontSize: 32,
+        fontWeight: '900',
+        color: '#262020',
+        justifyContent: 'space-between'
+    },
+    balContainer: {
+        flexDirection: 'column',
+        alignSelf: 'flex-end',
+        marginBottom: 10,
+    },
+    bal: {
+        position: 'absolute',
+        bottom: -5,
+        right: 3,
+        fontSize: 48,
+        fontWeight: '900',
+        color: 'white',
+    },
+    label: {
+        paddingTop: 5,
+        fontSize: 14,
+        color: '#262020',
+    },
+    updateInfo: {
+        position: 'absolute',
+        bottom: -10,
+        right: 3,
+        fontSize: 12,
+        color: '#B57E4D',
+
     },
 });
