@@ -173,7 +173,7 @@ export default function Home() {
                     <Text style={styles.name}>, {nickname}</Text>
                 </Text>
                 <TouchableOpacity
-                    style={styles.qrcontainer}
+                    style={[styles.qrcontainer, fave ? {} : { opacity: 0.4 }]}
                     onPress={() => fave ? navigation.navigate('Scan' as never) : null}
                     disabled={!fave}
                 >

@@ -1,6 +1,6 @@
-import { useNavigation } from '@react-navigation/native';
+import { useIsFocused, useNavigation } from '@react-navigation/native';
 import * as React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MMKV } from 'react-native-mmkv'
 import Icon from 'react-native-vector-icons/Ionicons';
@@ -24,6 +24,9 @@ export default function Scan() {
     const [fetchUid, setFetchUid] = useState();
     const [fetchBal, setFetchBal] = useState();
     const [lastUpdated, setLastUpdated] = useState('');
+    const [loader, setLoader] = useState(false);
+    const isFocused = useIsFocused();
+
 
     const device = useCameraDevice('back')
 
@@ -59,6 +62,9 @@ export default function Scan() {
     })
 
     const fetchCard = async () => {
+        const date = new Date();
+        const formattedDate = `${date.getDate()} ${getMonthName(date.getMonth())} ${date.getFullYear()} ${date.getHours()}:${date.getMinutes() < 10 ? '0' : ''}${date.getMinutes()} ${date.getHours() >= 12 ? 'PM' : 'AM'}`;
+
         try {
             const response = await fetch(`https://mrt-system-be.onrender.com/cards/${fave}`, {
                 method: 'GET',
@@ -68,10 +74,14 @@ export default function Scan() {
             });
             const fetchedCard = await response.json();
             if (response.ok) {
-                setStationIn(fetchedCard.tapState)
+                setStationIn(fetchedCard.tapState);
+                setFetchUid(fetchedCard.uid);
+                setFetchBal(fetchedCard.bal);
+                setLastUpdated(formattedDate);
+                setLoader(false);
                 setBal(fetchedCard.bal);
-                console.log('tapState: ', fetchedCard.tapState)
-                console.log('bal: ', fetchedCard.bal)
+                // console.log('tapState: ', fetchedCard.tapState);
+                // console.log('bal: ', fetchedCard.bal);
             } else {
                 console.error('Failed to fetch cards');
             }
@@ -110,13 +120,13 @@ export default function Scan() {
                 body: JSON.stringify({ tapState: station })
             });
 
-            // const card = await response.json();
+            const card = await response.json();
             if (response.ok) {
                 console.log('Tap in successful');
                 setStation('')
 
             } else {
-                console.log('Tap in failed')
+                console.log(card.message)
             }
         } catch (error) {
             console.error('Error fetching cards:', error);
@@ -124,6 +134,10 @@ export default function Scan() {
     }
 
     const preTapOut = async () => {
+        if (totalFare > bal) {
+            //     console.log('Insufficient balance to tap out');
+            return;
+        }
         try {
             const response = await fetch(`https://mrt-system-be.onrender.com/cards/tapOut/${fave}`, {
                 method: 'PATCH',
@@ -182,9 +196,15 @@ export default function Scan() {
             hour12: true
         });
 
-        await preTapOut();
+        const pretapout = await preTapOut();
+        pretapout
         const totalBal = bal - totalFare;
-        console.log(totalBal)
+        // console.log('totalBal: ', totalBal)
+
+        if (totalFare > bal) {
+            console.log('Insufficient balance to tap out');
+            return;
+        }
 
         try {
             // Update the database with the final balance immediately
@@ -208,11 +228,16 @@ export default function Scan() {
         }
     }
 
+    const getMonthName = (monthIndex: number) => {
+        const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        return months[monthIndex];
+    }
 
     useEffect(() => {
         fetchCard();
         getFare();
-    }, [cameraVisible]);
+        setLoader(true)
+    }, [cameraVisible, isFocused]);
 
     return (
         <SafeAreaView style={styles.background}>
@@ -254,10 +279,10 @@ export default function Scan() {
                     <TouchableOpacity
                         onPress={() => toggleCamera()}>
                         <View style={styles.scanContainer}>
-                            <Text style={styles.scanBtn}>CLICK TO SCAN</Text>
+                            <Text style={styles.scanBtn}>CLICK TO SCAN STATION</Text>
                         </View>
                     </TouchableOpacity>
-                    <View>
+                    <View style={styles.inputContainer}>
                         <TextInput
                             style={styles.input}
                             placeholder='e.g station name'
@@ -289,7 +314,11 @@ export default function Scan() {
                     <Text style={styles.signOutBtnText}>Tap Out</Text>
                 </TouchableOpacity>
             </View>
-
+            {loader && (
+                <View style={styles.loadingContainer}>
+                    <ActivityIndicator size="large" color="#fece2e" />
+                </View>
+            )}
 
 
         </SafeAreaView >
@@ -297,6 +326,13 @@ export default function Scan() {
 }
 
 const styles = StyleSheet.create({
+    loadingContainer: {
+        ...StyleSheet.absoluteFillObject,
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        justifyContent: 'center',
+        alignItems: 'center',
+        zIndex: 100,
+    },
     cameraContainer: {
         flex: 1,
         position: 'relative',
@@ -341,7 +377,7 @@ const styles = StyleSheet.create({
     },
     signOutContainer: {
         position: 'absolute',
-        bottom: 0,
+        bottom: 5,
         alignItems: 'center',
         width: '90%',
         flexDirection: 'row',
@@ -365,8 +401,13 @@ const styles = StyleSheet.create({
         color: '#262020',
         fontWeight: '500',
     },
+    inputContainer: {
+        position: 'absolute',
+        bottom: 70,
+        width: '97%',
+        margin: 7,
+    },
     input: {
-        position: 'relative',
         height: 50,
         padding: 15,
         marginHorizontal: 15,
@@ -386,10 +427,10 @@ const styles = StyleSheet.create({
         margin: 15,
         padding: 10,
         width: '92%',
-        height: '70%',
+        height: '50%',
     },
     scanBtn: {
-        color: 'black',
+        color: '#262020',
         fontWeight: '900',
         fontSize: 24,
     },
