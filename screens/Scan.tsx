@@ -7,6 +7,7 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import { useEffect, useState } from 'react';
 import { Camera, useCameraDevice, useCameraPermission, useCodeScanner } from 'react-native-vision-camera';
 import { TextInput } from 'react-native-gesture-handler';
+import Toast from 'react-native-simple-toast';
 
 export const storage = new MMKV()
 
@@ -57,7 +58,10 @@ export default function Scan() {
             setCameraVisible(false)
             traveledDistance(stationIn, value!)
             console.log('in, out: ', stationIn, value!)
-            // fetchCard();
+            Toast.show(
+                'QR Scanned',
+                0.5,
+            );
         }
     })
 
@@ -122,11 +126,20 @@ export default function Scan() {
 
             const card = await response.json();
             if (response.ok) {
+                fetchCard();
                 console.log('Tap in successful');
                 setStation('')
+                Toast.show(
+                    'Tapped in succesful!',
+                    0.5,
+                );
 
             } else {
                 console.log(card.message)
+                Toast.show(
+                    card.message,
+                    0.5,
+                );
             }
         } catch (error) {
             console.error('Error fetching cards:', error);
@@ -217,11 +230,20 @@ export default function Scan() {
             });
 
             if (response.ok) {
+                fetchCard();
                 console.log('Tap out successful!')
+                Toast.show(
+                    'Tapped out successful!',
+                    0.5,
+                );
                 setStation('')
 
             } else {
                 console.error('Failed to update card balance');
+                Toast.show(
+                    'Failed to update card balance',
+                    0.5,
+                );
             }
         } catch (error) {
             console.error('Error updating card balance:', error);
@@ -257,14 +279,19 @@ export default function Scan() {
                 <View style={{ flex: 1 }}></View>
                 <TouchableOpacity
                     onPress={() => toggleCamera()}>
-                    <Text style={{ color: 'black', marginRight: 10 }}>Scan</Text>
+                    {/* <Text style={{ color: 'black', marginRight: 10 }}>Scan</Text> */}
+                    <Icon
+                        name="scan-circle-outline"
+                        size={35}
+                        style={styles.goBackIcon}
+                    />
                 </TouchableOpacity>
             </View>
             <View style={styles.card}>
                 <View style={styles.cardContent}>
                     <View style={styles.cardTop}>
                         <View>
-                            <Text style={styles.label}>Label</Text>
+                            {/* <Text style={styles.label}>Label</Text> */}
                             <Text style={styles.uid}>{fetchUid}</Text>
                         </View>
                     </View>
@@ -465,7 +492,8 @@ const styles = StyleSheet.create({
         fontSize: 32,
         fontWeight: '900',
         color: '#262020',
-        justifyContent: 'space-between'
+        justifyContent: 'space-between',
+        paddingTop: 10,
     },
     balContainer: {
         flexDirection: 'column',

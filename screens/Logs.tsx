@@ -89,7 +89,7 @@ export default function Logs() {
                 <View style={styles.cardContent}>
                     <View style={styles.cardTop}>
                         <View>
-                            <Text style={styles.label}>Label</Text>
+                            {/* <Text style={styles.label}>Label</Text> */}
                             <Text style={styles.uid}>{uid}</Text>
                         </View>
                     </View>
@@ -284,7 +284,8 @@ const styles = StyleSheet.create({
         fontSize: 32,
         fontWeight: '900',
         color: '#262020',
-        justifyContent: 'space-between'
+        justifyContent: 'space-between',
+        paddingTop: 10,
     },
     balContainer: {
         flexDirection: 'column',

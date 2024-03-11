@@ -6,6 +6,7 @@ import { MMKV } from 'react-native-mmkv'
 import DeviceInfo from 'react-native-device-info';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { useEffect, useState } from 'react';
+import Toast from 'react-native-simple-toast';
 
 export const storage = new MMKV()
 
@@ -25,7 +26,6 @@ export default function Account() {
 
     const userPin = storage.getString('user_pin');
     console.log('account:', userPin);
-    const emptyPin = '';
     const nickname = storage.getString('nickname');
 
     const removeAllCards = async () => {
@@ -38,8 +38,16 @@ export default function Account() {
             });
             if (response.ok) {
                 console.log('')
+                Toast.show(
+                    'Successfully closed account',
+                    0.5,
+                );
             } else {
                 console.log("Failed to remove all cards");
+                Toast.show(
+                    'Failed to remove account',
+                    0.5,
+                );
             }
         } catch (error) {
             console.error('Error removing linked cards:', error);
@@ -81,16 +89,16 @@ export default function Account() {
                 </TouchableOpacity>
             </View>
             <View style={styles.nameContainer}>
-                <Text style={styles.name}>{nickname}</Text>
+                <Text style={styles.name}>Hi, {nickname}!</Text>
             </View>
             <View style={styles.settingsContainer}>
-                <Text style={styles.settingItem}>Change PIN</Text>
+                {/* <Text style={styles.settingItem}>Change PIN</Text> */}
                 <TouchableOpacity
                     onPress={handleCloseAccount}>
                     <Text style={styles.settingItem}>Close Account</Text>
                 </TouchableOpacity>
-                <Text style={styles.settingItem}>FAQs</Text>
-                <Text style={styles.settingItem}>About</Text>
+                {/* <Text style={styles.settingItem}>FAQs</Text> */}
+                {/* <Text style={styles.settingItem}>About</Text> */}
             </View>
 
         </SafeAreaView >

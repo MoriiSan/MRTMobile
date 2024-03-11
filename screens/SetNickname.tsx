@@ -14,6 +14,8 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import { MMKV } from 'react-native-mmkv'
 import { useState } from 'react';
 import { Modal } from 'react-native';
+import Toast from 'react-native-simple-toast';
+
 
 export const storage = new MMKV()
 
@@ -26,6 +28,10 @@ export default function SetNickname() {
         const nicknameSet = nickname.trim();
         if (nicknameSet) {
             storage.set('nickname', nicknameSet);
+            Toast.show(
+                'Nickname set',
+                0.5,
+            );
             navigation.navigate('Home' as never);
         } else {
             setModalVisible(true);

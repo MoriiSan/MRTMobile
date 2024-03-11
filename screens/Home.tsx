@@ -8,14 +8,12 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import DeviceInfo from 'react-native-device-info';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { BackHandler } from 'react-native';
-
+import Toast from 'react-native-simple-toast';
 
 interface Card {
     uid: number;
     bal: number;
 }
-
-const SESSION_TIMEOUT_DURATION = 0.1 * 60 * 1000;
 
 export const storage = new MMKV()
 
@@ -96,6 +94,10 @@ export default function Home() {
                 console.log('card successfully unlinked!')
             } else {
                 console.log("Failed to remove card");
+                Toast.show(
+                    'Failed to remove card',
+                    0.5,
+                );
             }
         } catch (error) {
             console.error('Error removing linked card:', error);
@@ -112,12 +114,22 @@ export default function Home() {
         }
     };
 
+    const duration = 0.05;
+
     const faveCard = (uid: number) => {
         try {
             storage.set('faveCard', uid.toString());
+            Toast.show(
+                'Card set as favorite',
+                duration,
+            );
             onRefresh();
         } catch (error) {
             console.error('Error saving fave card:', error);
+            Toast.show(
+                'Error saving fave card',
+                duration,
+            );
         }
     };
 
@@ -146,6 +158,7 @@ export default function Home() {
         onRefresh();
         setLoader(true)
     }, [isFocused]);
+
 
     useEffect(() => {
         const backAction = () => {
@@ -254,7 +267,7 @@ export default function Home() {
                         <View style={styles.cardContent}>
                             <View style={styles.cardTop}>
                                 <View>
-                                    <Text style={styles.label}>Label</Text>
+                                    {/* <Text style={styles.label}>Label</Text> */}
                                     <Text style={styles.uid}>{card.uid}</Text>
                                 </View>
                                 <TouchableOpacity
@@ -413,7 +426,8 @@ const styles = StyleSheet.create({
         fontSize: 32,
         fontWeight: '900',
         color: '#262020',
-        justifyContent: 'space-between'
+        justifyContent: 'space-between',
+        paddingTop: 10,
     },
     balContainer: {
         flexDirection: 'column',

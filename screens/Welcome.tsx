@@ -14,6 +14,7 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import { MMKV } from 'react-native-mmkv'
 import { useEffect, useState } from 'react';
 import { Modal } from 'react-native';
+import Toast from 'react-native-simple-toast';
 
 export const storage = new MMKV()
 
@@ -39,9 +40,17 @@ export default function Welcome() {
     const handlePinSubmit = () => {
         if (pin.length === 6) {
             storage.set('user_pin', pin);
+            Toast.show(
+                'PIN created',
+                0.5,
+            );
             navigation.navigate('SetNickname' as never);
         } else {
             console.log("PIN must be 6 digits long.");
+            Toast.show(
+                'PIN must be 6 digits long.',
+                0.5,
+            );
         }
     };
 

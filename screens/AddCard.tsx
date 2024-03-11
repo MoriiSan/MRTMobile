@@ -7,6 +7,7 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import { useEffect, useState } from 'react';
 import DeviceInfo from 'react-native-device-info';
 import { Camera, useCameraDevice, useCameraPermission, useCodeScanner } from 'react-native-vision-camera';
+import Toast from 'react-native-simple-toast';
 
 export default function AddCard() {
     const navigation = useNavigation();
@@ -41,17 +42,29 @@ export default function AddCard() {
             });
             if (response.ok) {
                 console.log('Card linked successfully');
+                Toast.show(
+                    'Card linked successfully',
+                    0.5,
+                );
                 navigation.navigate('Home' as never);
                 onChangeNumber('');
                 onChangeText('');
             } else {
                 console.log('Failed to link card');
+                Toast.show(
+                    'Failed to link card',
+                    0.5,
+                );
                 onChangeNumber('');
                 onChangeText('');
                 setModalVisible(true);
             }
         } catch (error) {
             console.error('Error linking card:', error);
+            Toast.show(
+                'Error linking card',
+                0.5,
+            );
         }
     };
 
@@ -65,6 +78,7 @@ export default function AddCard() {
             setCameraVisible(!cameraVisible); // Ensure the camera is shown when toggling
         }
     };
+
     const isValidBeepCard = (value: string) => {
         const regex = /^[0-9\b]+$/;
         return regex.test(value);
@@ -75,9 +89,13 @@ export default function AddCard() {
         onCodeScanned: (codes) => {
             const { value } = codes[0];
             if (isValidBeepCard(value!.toString())) {
-                console.log(`Scanned ${value}!`)
-                onChangeNumber(value!)
-                setCameraVisible(false)
+                console.log(`Scanned ${value}!`);
+                onChangeNumber(value!);
+                setCameraVisible(false);
+                Toast.show(
+                    'QR scanned',
+                    0.5,
+                );
             }
         }
     })
@@ -104,7 +122,13 @@ export default function AddCard() {
                 <View style={{ flex: 1 }}></View>
                 <TouchableOpacity
                     onPress={() => toggleCamera()}>
-                    <Text style={{ color: 'black', marginRight: 10 }}>QR</Text>
+                    {/* <Text style={{ color: 'black', marginRight: 10 }}>QR</Text>
+                     */}
+                    <Icon
+                        name="scan-circle-outline"
+                        size={35}
+                        style={styles.goBackIcon}
+                    />
                 </TouchableOpacity>
             </View>
             <View >
@@ -125,7 +149,7 @@ export default function AddCard() {
                         maxLength={10}
                     />
                 </View>
-                <View style={styles.inputContainer}>
+                {/* <View style={styles.inputContainer}>
                     <Text style={styles.inputLabel}>Card Label (optional)</Text>
                     <TextInput
                         style={styles.input}
@@ -134,7 +158,7 @@ export default function AddCard() {
                         onChangeText={onChangeText}
                         value={text}
                     />
-                </View>
+                </View> */}
             </View>
 
             {cameraVisible &&
