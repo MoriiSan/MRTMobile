@@ -48,7 +48,7 @@ export default function Account() {
 
     const handleCloseAccount = () => {
         removeAllCards();
-        storage.set('user_pin', emptyPin)
+        storage.clearAll();
         navigation.navigate('Welcome' as never);
     }
 

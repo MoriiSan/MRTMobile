@@ -218,7 +218,7 @@ export default function Welcome() {
 
     return (
         <SafeAreaView style={styles.container}>
-            {userPin == '' ? (
+            {userPin == null ? (
                 <>
                     <View style={styles.pinContainer}>
                         <View style={styles.pinTextContainer}>
