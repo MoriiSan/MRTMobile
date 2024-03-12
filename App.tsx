@@ -17,24 +17,11 @@ const Stack = createStackNavigator();
 export const storage = new MMKV()
 
 export default function App() {
-  //   const [isSessionActive, setIsSessionActive] = useState(false);
-
-  //   const updateSession = () => {
-  //     const currentTime = new Date().getTime();
-  //     const sessionDuration = 5 * 1000; // 1 hour in milliseconds
-  //     const sessionExpirationTime = currentTime + sessionDuration;
-  //     storage.set('sessionExpirationTime', sessionExpirationTime.toString());
-  //     setIsSessionActive(true);
-  //   };
-
-  //   useEffect(() => {
-  //     updateSession();
-  // }, []);
-
+ 
   return (
     <UserInactivityWrapper>
       <NavigationContainer>
-        <Stack.Navigator initialRouteName="Home">
+        <Stack.Navigator initialRouteName="Welcome">
           <Stack.Screen
             name="Welcome"
             component={Welcome}

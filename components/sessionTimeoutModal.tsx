@@ -15,10 +15,8 @@ const SessionModal: React.FC<SessionModalProps> = ({ isVisible, onClose, title, 
     }
 
     const handleOk = () => {
-        // Handle logic for OK button click here
-        // simple that that says that app has timed out
         setTimeout(() => {
-            RNExitApp.exitApp(); // Exit the app after 1 second
+            RNExitApp.exitApp();
         }, 1000);
     };
 
@@ -27,16 +25,13 @@ const SessionModal: React.FC<SessionModalProps> = ({ isVisible, onClose, title, 
             <View style={styles.modalContent}>
                 <View style={styles.modalHeader}>
                     <Text style={styles.modalTitle}>{title}</Text>
-                    <TouchableOpacity onPress={onClose}>
-                        <Text style={styles.closeButton}>&times;</Text>
-                    </TouchableOpacity>
                 </View>
                 <View style={styles.modalBody}>
                     <Text style={styles.textStyle}>{message}</Text>
                 </View>
                 <View style={styles.modalFooter}>
                     <TouchableOpacity onPress={handleOk} style={styles.okButton}>
-                        <Text style={styles.okButtonText}>OK</Text>
+                        <Text style={styles.okButtonText}>Exit app</Text>
                     </TouchableOpacity>
                 </View>
             </View>
@@ -46,15 +41,22 @@ const SessionModal: React.FC<SessionModalProps> = ({ isVisible, onClose, title, 
 
 const styles = StyleSheet.create({
     modal: {
-        flex: 1,
+        position: 'absolute',
+        top: 0,
+        bottom: 0,
+        left: 0,
+        right: 0,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        backgroundColor: 'rgba(0, 0, 0, 0.3)',
     },
     modalContent: {
-        backgroundColor: 'white',
-        borderRadius: 8,
+        margin: 20,
+        backgroundColor: "#a8d5e5",
+        borderRadius: 10,
         padding: 20,
+        alignItems: "center",
+        borderWidth: 1.5,
         width: '80%',
     },
     modalHeader: {
@@ -64,33 +66,33 @@ const styles = StyleSheet.create({
         marginBottom: 10,
     },
     modalTitle: {
-        color: 'black',
+        color: '#262020',
         fontSize: 18,
-        fontWeight: 'bold',
-    },
-    closeButton: {
-        color: 'black',
-        fontSize: 18,
+        fontWeight: '800',
     },
     modalBody: {
         marginBottom: 20,
     },
     modalFooter: {
-        flexDirection: 'row',
-        justifyContent: 'flex-end',
+        borderRadius: 10,
+        width: '100%',
     },
     okButton: {
-        backgroundColor: '#007AFF',
-        borderRadius: 5,
+        borderRadius: 10,
         paddingVertical: 10,
         paddingHorizontal: 20,
+        alignItems: 'center',
+        backgroundColor: "white",
+        borderWidth: 1.5,
+        borderBottomWidth: 4,
+        borderRightWidth: 4,
     },
     okButtonText: {
-        color: 'white',
+        color: '#262020',
         fontWeight: 'bold',
     },
     textStyle: {
-        color: 'black'
+        color: '#262020'
     },
 });
 

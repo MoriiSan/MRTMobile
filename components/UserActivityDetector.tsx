@@ -1,6 +1,6 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState } from 'react';
 import UserInactivity from 'react-native-user-detector-active-inactive';
-import SessionModal from './sessionTimeoutModal'; // Import ConfirmationModal
+import SessionModal from './sessionTimeoutModal';
 
 interface UserInactivityContextType {
     resetTimer: () => void;
@@ -14,19 +14,25 @@ interface UserInactivityWrapperProps {
 
 const UserInactivityWrapper: React.FC<UserInactivityWrapperProps> = ({ children }) => {
     const [timerKey, setTimerKey] = useState(0);
-    const [isModalVisible, setIsModalVisible] = useState(false); // State to manage modal visibilit
+    const [isModalVisible, setIsModalVisible] = useState(false);
 
     const resetTimer = () => {
         setTimerKey(prevKey => prevKey + 1);
     };
+
+    // Reset the timer on component mount
+    useEffect(() => {
+        resetTimer();
+    }, []);
 
     return (
         <>
             <UserInactivityContext.Provider value={{ resetTimer }}>
                 <UserInactivity
                     key={timerKey}
-                    timeForInactivity={10} // Set time for timeout
+                    timeForInactivity={120} // Set time for timeout
                     onHandleActiveInactive={() => {
+                        resetTimer();
                         setIsModalVisible(true);
                     }}
                 >

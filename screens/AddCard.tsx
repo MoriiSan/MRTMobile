@@ -32,6 +32,16 @@ export default function AddCard() {
 
     const saveCard = async () => {
         console.log('Linking card');
+        if (number === '') {
+            console.log('Card number input is empty');
+            Toast.show('Card number input is empty', 0.5);
+            return;
+        } else if (number.length !== 10) {
+            console.log('Card number input is incomplete');
+            Toast.show('Card number input is incomplete', 0.5);
+            return;
+        }
+
         try {
             const response = await fetch(`https://mrt-system-be.onrender.com/cards/linkCard/${number}`, {
                 method: 'PATCH',
@@ -176,6 +186,7 @@ export default function AddCard() {
 
             <View style={styles.saveContainer}>
                 <TouchableOpacity
+                    style={styles.saveBtn}
                     onPress={saveCard}>
                     <Text style={styles.saveBtnText}>Save Card</Text>
                 </TouchableOpacity>
@@ -271,6 +282,12 @@ const styles = StyleSheet.create({
     saveContainer: {
         position: 'absolute',
         bottom: 0,
+        alignItems: 'center',
+        alignSelf: 'stretch',
+        width: '100%',
+    },
+    saveBtn: {
+        color: '#262020',
         padding: 10,
         margin: 15,
         backgroundColor: '#fece2e',
@@ -279,9 +296,8 @@ const styles = StyleSheet.create({
         borderBottomWidth: 4,
         borderRightWidth: 4,
         borderRadius: 10,
-        width: '90%',
         alignItems: 'center',
-        alignSelf: 'center'
+        alignSelf: 'stretch'
     },
     saveBtnText: {
         color: '#262020',
