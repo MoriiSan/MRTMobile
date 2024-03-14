@@ -8,7 +8,8 @@ import {
     View,
     TextInput,
     TouchableOpacity,
-    StyleSheet
+    StyleSheet,
+    Alert
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { MMKV } from 'react-native-mmkv'
@@ -28,10 +29,7 @@ export default function SetNickname() {
         const nicknameSet = nickname.trim();
         if (nicknameSet) {
             storage.set('nickname', nicknameSet);
-            Toast.show(
-                'Nickname set',
-                0.5,
-            );
+            Alert.alert('INFO','Nickname set');
             navigation.navigate('Home' as never);
         } else {
             setModalVisible(true);

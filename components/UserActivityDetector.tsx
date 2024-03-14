@@ -30,7 +30,7 @@ const UserInactivityWrapper: React.FC<UserInactivityWrapperProps> = ({ children 
             <UserInactivityContext.Provider value={{ resetTimer }}>
                 <UserInactivity
                     key={timerKey}
-                    timeForInactivity={120} // Set time for timeout
+                    timeForInactivity={600} // Set time for timeout
                     onHandleActiveInactive={() => {
                         resetTimer();
                         setIsModalVisible(true);

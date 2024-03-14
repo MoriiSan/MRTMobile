@@ -1,13 +1,13 @@
 import { useNavigation } from '@react-navigation/native';
 import * as React from 'react';
 // import AsyncStorage from '@react-native-async-storage/async-storage';
-import { View, Text, StyleSheet, TouchableOpacity, TextInput, Modal, Pressable } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, Modal, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { useEffect, useState } from 'react';
 import DeviceInfo from 'react-native-device-info';
 import { Camera, useCameraDevice, useCameraPermission, useCodeScanner } from 'react-native-vision-camera';
-import Toast from 'react-native-simple-toast';
+// import { Toast } from 'toastify-react-native'
 
 export default function AddCard() {
     const navigation = useNavigation();
@@ -31,14 +31,14 @@ export default function AddCard() {
     };
 
     const saveCard = async () => {
-        console.log('Linking card');
+        // console.log('Linking card');
         if (number === '') {
-            console.log('Card number input is empty');
-            Toast.show('Card number input is empty', 0.5);
+            // console.log('Card number input is empty');
+            Alert.alert('OOPS','Card number input is empty');
             return;
         } else if (number.length !== 10) {
-            console.log('Card number input is incomplete');
-            Toast.show('Card number input is incomplete', 0.5);
+            // console.log('Card number input is incomplete');
+            Alert.alert('OOPS','Card number input is incomplete');
             return;
         }
 
@@ -50,36 +50,29 @@ export default function AddCard() {
                 },
                 body: JSON.stringify({ devId: deviceId }),
             });
+
+            const linkCard = await response.json();
             if (response.ok) {
-                console.log('Card linked successfully');
-                Toast.show(
-                    'Card linked successfully',
-                    0.5,
-                );
+                // console.log('Card linked successfully');
+                Alert.alert('SUCCESS', 'Card linked successfully');
                 navigation.navigate('Home' as never);
                 onChangeNumber('');
                 onChangeText('');
             } else {
-                console.log('Failed to link card');
-                Toast.show(
-                    'Failed to link card',
-                    0.5,
-                );
+                // console.log(linkCard.message);
+                Alert.alert('OOPS',linkCard.message);
                 onChangeNumber('');
                 onChangeText('');
-                setModalVisible(true);
+                // setModalVisible(true);
             }
         } catch (error) {
             console.error('Error linking card:', error);
-            Toast.show(
-                'Error linking card',
-                0.5,
-            );
+            Alert.alert('Error linking card');
         }
     };
 
     const toggleCamera = async () => {
-        console.log('QR clicked')
+        // console.log('QR clicked')
         if (!hasPermission) {
             if (await requestPermission()) {
                 setCameraVisible(!cameraVisible); // Ensure the camera is shown when toggling
@@ -99,16 +92,17 @@ export default function AddCard() {
         onCodeScanned: (codes) => {
             const { value } = codes[0];
             if (isValidBeepCard(value!.toString())) {
-                console.log(`Scanned ${value}!`);
+                // console.log(`Scanned ${value}!`);
                 onChangeNumber(value!);
                 setCameraVisible(false);
-                Toast.show(
-                    'QR scanned',
-                    0.5,
-                );
+                // Alert.alert('QR scanned');
+            } else {
+                setCameraVisible(false);
+                // console.log(`Invalid QR code: ${value}`);
+                Alert.alert('OOPS', 'Invalid QR Code')
             }
-        }
-    })
+        },
+    });
 
     useEffect(() => {
         fetchDeviceId();

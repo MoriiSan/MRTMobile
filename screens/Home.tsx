@@ -7,7 +7,7 @@ import { ScrollView } from 'react-native-gesture-handler';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import DeviceInfo from 'react-native-device-info';
 import Icon from 'react-native-vector-icons/Ionicons';
-import { BackHandler } from 'react-native';
+import { BackHandler, Alert } from 'react-native';
 import Toast from 'react-native-simple-toast';
 
 interface Card {
@@ -91,16 +91,15 @@ export default function Home() {
                 setModalVisible(true)
                 setModalDelete(!modalDelete)
                 storage.set('faveCard', '');
-                console.log('card successfully unlinked!')
+                // console.log('card successfully unlinked!')
+                Alert.alert('SUCCESS','card successfully unlinked!')
             } else {
-                console.log("Failed to remove card");
-                Toast.show(
-                    'Failed to remove card',
-                    0.5,
-                );
+                // console.log("Failed to remove card");
+                Alert.alert('OOPS','Failed to remove card');
             }
         } catch (error) {
             console.error('Error removing linked card:', error);
+            Alert.alert('ERROR','Error removing linked card');
         }
     };
 
@@ -114,22 +113,14 @@ export default function Home() {
         }
     };
 
-    const duration = 0.05;
-
     const faveCard = (uid: number) => {
         try {
             storage.set('faveCard', uid.toString());
-            Toast.show(
-                'Card set as favorite',
-                duration,
-            );
+            Alert.alert('INFO','Card set as favorite');
             onRefresh();
         } catch (error) {
             console.error('Error saving fave card:', error);
-            Toast.show(
-                'Error saving fave card',
-                duration,
-            );
+            Alert.alert('OOPS','Error saving fave card');
         }
     };
 
@@ -235,75 +226,55 @@ export default function Home() {
                 </View>
             </Modal>
 
-            {/* modal successfully unlinked card */}
-            <Modal
-                animationType="fade"
-                transparent={true}
-                visible={modalVisible}
-                onRequestClose={() => {
-                    setModalVisible(!modalVisible);
-                }}
-            >
-                <View style={styles.centeredView}>
-                    <View style={styles.modalView}>
-                        <Text style={styles.modalText}>Card successfully removed.</Text>
-                        <TouchableOpacity
-                            style={[styles.button, styles.buttonClose]}
-                            onPress={() => setModalVisible(!modalVisible)}
-                        >
-                            <Text style={styles.textStyle}>Close</Text>
-                        </TouchableOpacity>
-                    </View>
-                </View>
-            </Modal>
-
             {/* removeLinkedCard(card.uid) */}
 
             {/* card ///////////////// */}
             <ScrollView refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh}
                 style={{ flexGrow: 1 }} />}>
                 {cards.map((card, index) => (
-                    <View key={index} style={styles.card}>
-                        <View style={styles.cardContent}>
-                            <View style={styles.cardTop}>
-                                <View>
-                                    {/* <Text style={styles.label}>Label</Text> */}
-                                    <Text style={styles.uid}>{card.uid}</Text>
+                    <TouchableOpacity key={index}>
+                        <View style={styles.card}>
+                            <View style={styles.cardContent}>
+                                <View style={styles.cardTop}>
+                                    <View>
+                                        {/* <Text style={styles.label}>Label</Text> */}
+                                        <Text style={styles.uid}>{card.uid}</Text>
+                                    </View>
+                                    <TouchableOpacity
+                                        onPress={() => openDeleteModal(card.uid)}
+                                    >
+                                        <Icon name="trash-outline" size={22} style={{ color: '#a1aab8', marginTop: 8 }} />
+                                    </TouchableOpacity>
                                 </View>
-                                <TouchableOpacity
-                                    onPress={() => openDeleteModal(card.uid)}
-                                >
-                                    <Icon name="trash-outline" size={22} style={{ color: '#a1aab8', marginTop: 8 }} />
+                                <View style={styles.balContainer}>
+                                    <Text style={styles.bal}>PHP {card.bal}</Text>
+                                    <Text style={styles.updateInfo}>Last updated: {lastUpdated}</Text>
+                                </View>
+                            </View>
+                            <View style={styles.btns}>
+                                {fave === card.uid.toString() ? (
+                                    <TouchableOpacity style={styles.faveBtn}>
+                                        <Icon name="star" size={15} style={{ color: '#262020' }} />
+                                    </TouchableOpacity>
+                                ) : (
+                                    <TouchableOpacity
+                                        style={styles.faveBtn}
+                                        onPress={() => faveCard(card.uid)}
+                                    >
+                                        <Icon name="star-outline" size={15} style={{ color: '#262020' }} />
+                                    </TouchableOpacity>
+                                )}
+                                <TouchableOpacity style={styles.logsBtn}
+                                    onPress={() => navigateToLogs(card.uid)}>
+                                    <View style={styles.logsBtnLabel}>
+                                        <Icon name="document-text-outline" size={14} style={{ color: '#262020' }} />
+                                        <Text style={styles.logsBtnText}>Transaction Logs</Text>
+                                    </View>
+                                    <Icon name="arrow-forward-outline" size={20} style={{ color: '#262020' }} />
                                 </TouchableOpacity>
                             </View>
-                            <View style={styles.balContainer}>
-                                <Text style={styles.bal}>PHP {card.bal}</Text>
-                                <Text style={styles.updateInfo}>Last updated: {lastUpdated}</Text>
-                            </View>
                         </View>
-                        <View style={styles.btns}>
-                            {fave === card.uid.toString() ? (
-                                <TouchableOpacity style={styles.faveBtn}>
-                                    <Icon name="star" size={15} style={{ color: '#262020' }} />
-                                </TouchableOpacity>
-                            ) : (
-                                <TouchableOpacity
-                                    style={styles.faveBtn}
-                                    onPress={() => faveCard(card.uid)}
-                                >
-                                    <Icon name="star-outline" size={15} style={{ color: '#262020' }} />
-                                </TouchableOpacity>
-                            )}
-                            <TouchableOpacity style={styles.logsBtn}
-                                onPress={() => navigateToLogs(card.uid)}>
-                                <View style={styles.logsBtnLabel}>
-                                    <Icon name="document-text-outline" size={14} style={{ color: '#262020' }} />
-                                    <Text style={styles.logsBtnText}>Transaction Logs</Text>
-                                </View>
-                                <Icon name="arrow-forward-outline" size={20} style={{ color: '#262020' }} />
-                            </TouchableOpacity>
-                        </View>
-                    </View>
+                    </TouchableOpacity>
                 ))}
                 <View style={styles.emptyContainer}>
                     <Text style={styles.emptyText}>Pull down to refresh</Text>

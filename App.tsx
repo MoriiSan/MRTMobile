@@ -11,53 +11,57 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { useEffect, useState } from 'react';
 import { MMKV } from 'react-native-mmkv';
 import UserInactivityWrapper from './components/UserActivityDetector';
+import ToastManager, { Toast } from 'toastify-react-native'
 
 
 const Stack = createStackNavigator();
 export const storage = new MMKV()
 
 export default function App() {
- 
+
   return (
-    <UserInactivityWrapper>
-      <NavigationContainer>
-        <Stack.Navigator initialRouteName="Welcome">
-          <Stack.Screen
-            name="Welcome"
-            component={Welcome}
-            options={{ headerShown: false, gestureEnabled: false }} />
-          <Stack.Screen
-            name="SetNickname"
-            component={SetNickname}
-            options={{ headerShown: false, gestureEnabled: false }} />
-          <Stack.Screen
-            name="Home"
-            component={Home}
-            options={{ headerShown: false }}
-          />
-          <Stack.Screen
-            name="Account"
-            component={Account}
-            options={{ headerShown: false }}
-          />
-          <Stack.Screen
-            name="Transaction Logs"
-            component={Logs}
-            options={{ headerShown: false }}
-          />
-          <Stack.Screen
-            name="Add Card"
-            component={AddCard}
-            options={{ headerShown: false }}
-          />
-          <Stack.Screen
-            name="Scan"
-            component={Scan}
-            options={{ headerShown: false }}
-          />
-        </Stack.Navigator>
-      </NavigationContainer>
-    </UserInactivityWrapper>
+    <>
+      <UserInactivityWrapper>
+        <NavigationContainer>
+          <ToastManager />
+          <Stack.Navigator initialRouteName="Scan">
+            <Stack.Screen
+              name="Welcome"
+              component={Welcome}
+              options={{ headerShown: false, gestureEnabled: false }} />
+            <Stack.Screen
+              name="SetNickname"
+              component={SetNickname}
+              options={{ headerShown: false, gestureEnabled: false }} />
+            <Stack.Screen
+              name="Home"
+              component={Home}
+              options={{ headerShown: false }}
+            />
+            <Stack.Screen
+              name="Account"
+              component={Account}
+              options={{ headerShown: false }}
+            />
+            <Stack.Screen
+              name="Transaction Logs"
+              component={Logs}
+              options={{ headerShown: false }}
+            />
+            <Stack.Screen
+              name="Add Card"
+              component={AddCard}
+              options={{ headerShown: false }}
+            />
+            <Stack.Screen
+              name="Scan"
+              component={Scan}
+              options={{ headerShown: false }}
+            />
+          </Stack.Navigator>
+        </NavigationContainer>
+      </UserInactivityWrapper>
+    </>
   );
 }
 

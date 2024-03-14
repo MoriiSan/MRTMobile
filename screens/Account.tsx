@@ -1,6 +1,6 @@
 import { useNavigation } from '@react-navigation/native';
 import * as React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MMKV } from 'react-native-mmkv'
 import DeviceInfo from 'react-native-device-info';
@@ -18,14 +18,14 @@ export default function Account() {
         try {
             const id = await DeviceInfo.getUniqueId();
             setDeviceId(id);
-            console.log(id);
+            // console.log(id);
         } catch (error) {
             console.error('Error fetching device ID:', error);
         }
     };
 
     const userPin = storage.getString('user_pin');
-    console.log('account:', userPin);
+    // console.log('account:', userPin);
     const nickname = storage.getString('nickname');
 
     const removeAllCards = async () => {
@@ -38,16 +38,10 @@ export default function Account() {
             });
             if (response.ok) {
                 console.log('')
-                Toast.show(
-                    'Successfully closed account',
-                    0.5,
-                );
+                Alert.alert('SUCCESS','Successfully closed account');
             } else {
                 console.log("Failed to remove all cards");
-                Toast.show(
-                    'Failed to remove account',
-                    0.5,
-                );
+                Alert.alert('OOPS', 'Failed to remove account');
             }
         } catch (error) {
             console.error('Error removing linked cards:', error);
@@ -63,7 +57,7 @@ export default function Account() {
     useEffect(() => {
         fetchDeviceId();
     }, []);
-    
+
     return (
         <SafeAreaView style={styles.background}>
             <View style={styles.header}>

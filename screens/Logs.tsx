@@ -1,8 +1,8 @@
 import { useNavigation } from '@react-navigation/native';
 import * as React from 'react';
 import { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
-import { ScrollView } from 'react-native-gesture-handler';
+import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, TouchableWithoutFeedbackComponent } from 'react-native';
+import { ScrollView, TouchableWithoutFeedback } from 'react-native-gesture-handler';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MMKV } from 'react-native-mmkv'
 import Icon from 'react-native-vector-icons/Ionicons';
@@ -101,48 +101,50 @@ export default function Logs() {
             </View>
             <ScrollView style={styles.logsContainer}>
                 {logs.slice().reverse().map((log, index) => (
-                    <View key={index} style={styles.serviceContainer}>
-                        {(log.dateTravel && log.charge) ? (
-                            <>
-                                <View style={styles.leftSide}>
-                                    <Icon
-                                        name="navigate"
-                                        size={15}
-                                        style={styles.navigateIcon}
-                                    />
-                                    <View style={styles.service}>
-                                        <View style={styles.typeDate}>
-                                            <View>
-                                                <Text style={styles.serviceType}>MRT Rail Service Provider</Text>
-                                                <Text style={styles.serviceDate}>{log.dateTravel}</Text>
+                    <TouchableOpacity key={index}>
+                        <View  style={styles.serviceContainer}>
+                            {(log.dateTravel && log.charge) ? (
+                                <>
+                                    <View style={styles.leftSide}>
+                                        <Icon
+                                            name="navigate"
+                                            size={15}
+                                            style={styles.navigateIcon}
+                                        />
+                                        <View style={styles.service}>
+                                            <View style={styles.typeDate}>
+                                                <View>
+                                                    <Text style={styles.serviceType}>MRT Rail Service Provider</Text>
+                                                    <Text style={styles.serviceDate}>{log.dateTravel}</Text>
+                                                </View>
+                                                <Text style={styles.amount}>- PHP {log.charge}</Text>
                                             </View>
-                                            <Text style={styles.amount}>- PHP {log.charge}</Text>
                                         </View>
                                     </View>
-                                </View>
 
-                            </>
-                        ) : (
-                            <>
-                                <View style={styles.leftSide}>
-                                    <Icon
-                                        name="card"
-                                        size={15}
-                                        style={styles.cardIcon}
-                                    />
-                                    <View style={styles.service}>
-                                        <View style={styles.typeDate}>
-                                            <View>
-                                                <Text style={styles.serviceType}>E-Commerce Payment</Text>
-                                                <Text style={styles.serviceDate}>{log.dateLoaded}</Text>
+                                </>
+                            ) : (
+                                <>
+                                    <View style={styles.leftSide}>
+                                        <Icon
+                                            name="card"
+                                            size={15}
+                                            style={styles.cardIcon}
+                                        />
+                                        <View style={styles.service}>
+                                            <View style={styles.typeDate}>
+                                                <View>
+                                                    <Text style={styles.serviceType}>E-Commerce Payment</Text>
+                                                    <Text style={styles.serviceDate}>{log.dateLoaded}</Text>
+                                                </View>
+                                                <Text style={styles.amountTopUp}>+ PHP {log.topUp}</Text>
                                             </View>
-                                            <Text style={styles.amountTopUp}>+ PHP {log.topUp}</Text>
                                         </View>
                                     </View>
-                                </View>
-                            </>
-                        )}
-                    </View>
+                                </>
+                            )}
+                        </View>
+                    </TouchableOpacity>
                 ))}
             </ScrollView>
 

@@ -8,7 +8,8 @@ import {
     View,
     TextInput,
     TouchableOpacity,
-    StyleSheet
+    StyleSheet,
+    Alert
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { MMKV } from 'react-native-mmkv'
@@ -40,17 +41,11 @@ export default function Welcome() {
     const handlePinSubmit = () => {
         if (pin.length === 6) {
             storage.set('user_pin', pin);
-            Toast.show(
-                'PIN created',
-                0.5,
-            );
+            Alert.alert('SUCCESS','PIN created');
             navigation.navigate('SetNickname' as never);
         } else {
-            console.log("PIN must be 6 digits long.");
-            Toast.show(
-                'PIN must be 6 digits long.',
-                0.5,
-            );
+            // console.log("PIN must be 6 digits long.");
+            Alert.alert('OOPS','PIN must be 6 digits long.');
         }
     };
 
@@ -207,7 +202,7 @@ export default function Welcome() {
     };
 
     const userPin = storage.getString('user_pin');
-    console.log('welcome:', userPin);
+    // console.log('welcome:', userPin);
     const nickname = storage.getString('nickname');
 
     useEffect(() => {

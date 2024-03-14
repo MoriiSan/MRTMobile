@@ -1,6 +1,6 @@
 import { useIsFocused, useNavigation } from '@react-navigation/native';
 import * as React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MMKV } from 'react-native-mmkv'
 import Icon from 'react-native-vector-icons/Ionicons';
@@ -27,6 +27,8 @@ export default function Scan() {
     const [lastUpdated, setLastUpdated] = useState('');
     const [loader, setLoader] = useState(false);
     const isFocused = useIsFocused();
+    const [stationScanned, setStationScanned] = useState(false);
+    // const [stations, setStations] = useState();
 
 
     const device = useCameraDevice('back')
@@ -44,6 +46,27 @@ export default function Scan() {
         }
     };
 
+    // const fetchStations = async () => {
+    //     try {
+    //         const response = await fetch(`https://mrt-system-be.onrender.com/stations`, {
+    //             method: 'GET',
+    //             headers: {
+    //                 'Content-Type': 'application/json',
+    //             },
+    //         });
+    //         const fetchedStations = await response.json();
+    //         if (response.ok) {
+    //             setStations(fetchedStations)
+    //             console.log(fetchedStations.stationName)
+    //         } else {
+    //             console.error('Failed to fetch stations');
+    //         }
+    //     } catch (error) {
+    //         console.error('Error fetching stations:', error);
+    //     }
+    // };
+
+
     // const isValidBeepCard = (value: string) => {
     //     const regex = /^[0-9\b]+$/;
     //     return regex.test(value);
@@ -52,16 +75,20 @@ export default function Scan() {
     const codeScanner = useCodeScanner({
         codeTypes: ['qr', 'ean-13'],
         onCodeScanned: (codes) => {
-            const { value } = codes[0];
-            console.log(`Scanned ${value}!`)
-            setStation(value!)
-            setCameraVisible(false)
-            traveledDistance(stationIn, value!)
-            console.log('in, out: ', stationIn, value!)
-            Toast.show(
-                'QR Scanned',
-                0.5,
-            );
+            const value = codes[0].value;
+            // console.log(`Scanned ${value}!`)
+            if (value?.includes("Station")) {
+                setStation(value!)
+                setCameraVisible(false)
+                traveledDistance(stationIn, value!)
+                setStationScanned(true);
+                // console.log('in, out: ', stationIn, value!)
+                return;
+            } else {
+                setCameraVisible(false)
+                Alert.alert('OOPS', 'Invalid QR Code')
+                return;
+            }
         }
     })
 
@@ -105,7 +132,7 @@ export default function Scan() {
             if (response.ok) {
                 const fetchedFare = await response.json();
                 setFare(fetchedFare)
-                console.log('fare: ', fetchedFare)
+                // console.log('fare: ', fetchedFare)
             } else {
                 console.error('Failed to fetch fare');
             }
@@ -127,19 +154,14 @@ export default function Scan() {
             const card = await response.json();
             if (response.ok) {
                 fetchCard();
-                console.log('Tap in successful');
+                // console.log('Tap in successful');
                 setStation('')
-                Toast.show(
-                    'Tapped in succesful!',
-                    0.5,
-                );
+                setStationScanned(false);
+                Alert.alert('SUCCESS', 'Tapped in succesful!');
 
             } else {
-                console.log(card.message)
-                Toast.show(
-                    card.message,
-                    0.5,
-                );
+                // console.log(card.message)
+                Alert.alert('OOPS', card.message);
             }
         } catch (error) {
             console.error('Error fetching cards:', error);
@@ -164,8 +186,8 @@ export default function Scan() {
                 // setStationIn(card.tapState)
                 setStationOut(station);
                 setFinalBal(card.bal - totalFare)
-                console.log('finalBal:', card.bal - totalFare)
-                console.log('OK pre-tapout')
+                // console.log('finalBal:', card.bal - totalFare)
+                // console.log('OK pre-tapout')
             } else {
 
             }
@@ -189,7 +211,7 @@ export default function Scan() {
                 // console.log('totalFare:', Math.round(Number((distanceTraveled.totalFare).toFixed(1))));
 
                 setTotalFare(Math.round(Number((fare * distanceTraveled.distance).toFixed(1))));
-                console.log('Total Fare: ', ((fare * distanceTraveled.distance).toFixed(1)))
+                // console.log('Total Fare: ', ((fare * distanceTraveled.distance).toFixed(1)))
                 return Math.round(Number((fare * distanceTraveled.distance).toFixed(1)))
             } else {
                 console.error('Error setting edge distances');
@@ -215,7 +237,8 @@ export default function Scan() {
         // console.log('totalBal: ', totalBal)
 
         if (totalFare > bal) {
-            console.log('Insufficient balance to tap out');
+            // console.log('Insufficient balance to tap out');
+            Alert.alert('OOPS', 'Insufficient balance to tap out');
             return;
         }
 
@@ -231,19 +254,14 @@ export default function Scan() {
 
             if (response.ok) {
                 fetchCard();
-                console.log('Tap out successful!')
-                Toast.show(
-                    'Tapped out successful!',
-                    0.5,
-                );
+                // console.log('Tap out successful!')
+                setStationScanned(false);
+                Alert.alert('SUCCESS', 'Tapped out successful!');
                 setStation('')
 
             } else {
                 console.error('Failed to update card balance');
-                Toast.show(
-                    'Failed to update card balance',
-                    0.5,
-                );
+                Alert.alert('OOPS', 'Failed to update card balance');
             }
         } catch (error) {
             console.error('Error updating card balance:', error);
@@ -258,7 +276,7 @@ export default function Scan() {
     useEffect(() => {
         fetchCard();
         getFare();
-        setLoader(true)
+        setLoader(true);
     }, [cameraVisible, isFocused]);
 
     return (
@@ -331,13 +349,15 @@ export default function Scan() {
             }
             <View style={styles.signOutContainer}>
                 <TouchableOpacity
-                    style={styles.signOutBtn}
-                    onPress={() => handleTapIn()} >
+                    style={[styles.signOutBtn, !stationScanned && styles.disabledBtn]}
+                    onPress={() => handleTapIn()}
+                    disabled={!stationScanned}>
                     <Text style={styles.signOutBtnText}>Tap In</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
-                    style={styles.signOutBtn}
-                    onPress={() => handleTapOut()} >
+                    style={[styles.signOutBtn, !stationScanned && styles.disabledBtn]}
+                    onPress={() => handleTapOut()}
+                    disabled={!stationScanned} >
                     <Text style={styles.signOutBtnText}>Tap Out</Text>
                 </TouchableOpacity>
             </View>
@@ -521,4 +541,7 @@ const styles = StyleSheet.create({
         color: '#B57E4D',
 
     },
+    disabledBtn: {
+        opacity: 0.5,
+    }
 });
