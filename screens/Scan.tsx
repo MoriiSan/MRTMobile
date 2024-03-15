@@ -28,8 +28,6 @@ export default function Scan() {
     const [loader, setLoader] = useState(false);
     const isFocused = useIsFocused();
     const [stationScanned, setStationScanned] = useState(false);
-    // const [stations, setStations] = useState();
-
 
     const device = useCameraDevice('back')
 
@@ -46,31 +44,6 @@ export default function Scan() {
         }
     };
 
-    // const fetchStations = async () => {
-    //     try {
-    //         const response = await fetch(`https://mrt-system-be.onrender.com/stations`, {
-    //             method: 'GET',
-    //             headers: {
-    //                 'Content-Type': 'application/json',
-    //             },
-    //         });
-    //         const fetchedStations = await response.json();
-    //         if (response.ok) {
-    //             setStations(fetchedStations)
-    //             console.log(fetchedStations.stationName)
-    //         } else {
-    //             console.error('Failed to fetch stations');
-    //         }
-    //     } catch (error) {
-    //         console.error('Error fetching stations:', error);
-    //     }
-    // };
-
-
-    // const isValidBeepCard = (value: string) => {
-    //     const regex = /^[0-9\b]+$/;
-    //     return regex.test(value);
-    // };
 
     const codeScanner = useCodeScanner({
         codeTypes: ['qr', 'ean-13'],

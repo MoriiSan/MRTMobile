@@ -24,7 +24,7 @@ export default function App() {
       <UserInactivityWrapper>
         <NavigationContainer>
           <ToastManager />
-          <Stack.Navigator initialRouteName="Scan">
+          <Stack.Navigator initialRouteName="Welcome">
             <Stack.Screen
               name="Welcome"
               component={Welcome}
