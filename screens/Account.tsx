@@ -6,8 +6,6 @@ import { MMKV } from 'react-native-mmkv'
 import DeviceInfo from 'react-native-device-info';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { useEffect, useState } from 'react';
-import Toast from 'react-native-simple-toast';
-
 export const storage = new MMKV()
 
 export default function Account() {
@@ -30,7 +28,7 @@ export default function Account() {
 
     const removeAllCards = async () => {
         try {
-            const response = await fetch(`https://mrt-system-be.onrender.com/cards/remove-all-cards/${deviceId}`, {
+            const response = await fetch(`http://localhost:8080/cards/remove-all-cards/${deviceId}`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',

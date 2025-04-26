@@ -8,7 +8,6 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import DeviceInfo from 'react-native-device-info';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { BackHandler, Alert } from 'react-native';
-import Toast from 'react-native-simple-toast';
 
 interface Card {
     uid: number;
@@ -57,7 +56,7 @@ export default function Home() {
         if (!id) return;
 
         try {
-            const response = await fetch(`https://mrt-system-be.onrender.com/cards/linkedCards/${id}`, {
+            const response = await fetch(`http://localhost:8080/cards/linkedCards/${id}`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
@@ -80,7 +79,7 @@ export default function Home() {
 
     const removeLinkedCard = async (uid: number) => {
         try {
-            const response = await fetch(`https://mrt-system-be.onrender.com/cards/remove-card/${uid}`, {
+            const response = await fetch(`http://localhost:8080/cards/remove-card/${uid}`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',

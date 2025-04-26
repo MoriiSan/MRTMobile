@@ -30,7 +30,7 @@ export default function Logs() {
         const date = new Date();
         const formattedDate = `${date.getDate()} ${getMonthName(date.getMonth())} ${date.getFullYear()} ${date.getHours()}:${date.getMinutes() < 10 ? '0' : ''}${date.getMinutes()} ${date.getHours() >= 12 ? 'PM' : 'AM'}`;
         try {
-            const response = await fetch(`https://mrt-system-be.onrender.com/cards/${selectedUid}`, {
+            const response = await fetch(`http://localhost:8080/cards/${selectedUid}`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',

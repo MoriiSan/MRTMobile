@@ -15,7 +15,6 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import { MMKV } from 'react-native-mmkv'
 import { useState } from 'react';
 import { Modal } from 'react-native';
-import Toast from 'react-native-simple-toast';
 
 
 export const storage = new MMKV()

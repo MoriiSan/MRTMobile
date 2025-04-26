@@ -7,7 +7,6 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import { useEffect, useState } from 'react';
 import { Camera, useCameraDevice, useCameraPermission, useCodeScanner } from 'react-native-vision-camera';
 import { TextInput } from 'react-native-gesture-handler';
-import Toast from 'react-native-simple-toast';
 
 export const storage = new MMKV()
 
@@ -70,7 +69,7 @@ export default function Scan() {
         const formattedDate = `${date.getDate()} ${getMonthName(date.getMonth())} ${date.getFullYear()} ${date.getHours()}:${date.getMinutes() < 10 ? '0' : ''}${date.getMinutes()} ${date.getHours() >= 12 ? 'PM' : 'AM'}`;
 
         try {
-            const response = await fetch(`https://mrt-system-be.onrender.com/cards/${fave}`, {
+            const response = await fetch(`http://localhost:8080/cards/${fave}`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
@@ -96,7 +95,7 @@ export default function Scan() {
 
     const getFare = async () => {
         try {
-            const response = await fetch(`https://mrt-system-be.onrender.com/adminConfigs/fare`, {
+            const response = await fetch(`http://localhost:8080/adminConfigs/fare`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
@@ -116,7 +115,7 @@ export default function Scan() {
 
     const handleTapIn = async () => {
         try {
-            const response = await fetch(`https://mrt-system-be.onrender.com/cards/tapIn/${fave}`, {
+            const response = await fetch(`http://localhost:8080/cards/tapIn/${fave}`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',
@@ -147,7 +146,7 @@ export default function Scan() {
             return;
         }
         try {
-            const response = await fetch(`https://mrt-system-be.onrender.com/cards/tapOut/${fave}`, {
+            const response = await fetch(`http://localhost:8080/cards/tapOut/${fave}`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',
@@ -171,7 +170,7 @@ export default function Scan() {
 
     const traveledDistance = async (initialStation: string, finalStation: string) => {
         try {
-            const response = await fetch(`https://mrt-system-be.onrender.com/stations/traveled-distance`, {
+            const response = await fetch(`http://localhost:8080/stations/traveled-distance`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -217,7 +216,7 @@ export default function Scan() {
 
         try {
             // Update the database with the final balance immediately
-            const response = await fetch(`https://mrt-system-be.onrender.com/cards/user-update-card/${fave}`, {
+            const response = await fetch(`http://localhost:8080/cards/user-update-card/${fave}`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',

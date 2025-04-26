@@ -43,7 +43,7 @@ export default function AddCard() {
         }
 
         try {
-            const response = await fetch(`https://mrt-system-be.onrender.com/cards/linkCard/${number}`, {
+            const response = await fetch(`http://localhost:8080/cards/linkCard/${number}`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',
